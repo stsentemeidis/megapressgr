@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>megapress — Conference & Exhibition Photography</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --black:#0b0b0c;
+    --black-2:#131314;
+    --paper:#f2f1ee;
+    --paper-dim:#a7a6a3;
+    --orange:#ff5a1f;
+    --orange-dim:#b23e15;
+    --charcoal:#2a2a2d;
+    --steel:#6b6b70;
+    --line: rgba(242,241,238,0.12);
+    --line-strong: rgba(242,241,238,0.22);
+    --display: 'Space Grotesk', sans-serif;
+    --body: 'Inter', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--black); color:var(--paper); font-family:var(--body); overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+  a{ color:inherit; text-decoration:none; }
+  ::selection{ background:var(--orange); color:var(--black); }
+  a:focus-visible, button:focus-visible{ outline: 2px solid var(--orange); outline-offset: 3px; }
+
+  .wrap{ max-width:1280px; margin:0 auto; padding:0 40px; }
+
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--orange); display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:18px; height:1px; background:var(--orange); display:inline-block; }
+
+  /* ===================== WORDMARK ===================== */
+  .wordmark{ display:inline-flex; flex-direction:column; line-height:1; user-select:none; cursor:pointer; }
+  .wordmark .kicker{ font-family:var(--mono); font-size:8px; letter-spacing:0.34em; color:var(--steel); margin-bottom:3px; white-space:nowrap; }
+  .wordmark .name{ font-family:var(--display); font-weight:700; font-size:22px; letter-spacing:-0.02em; display:flex; }
+  .wordmark .name .mega{ color:var(--orange); }
+  .wordmark .name .press{ color:var(--paper); }
+  header.scrolled .wordmark .kicker{ display:none; }
+
+  /* ===================== NAV ===================== */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    padding:26px 40px; display:flex; justify-content:space-between; align-items:center;
+    transition: background 0.4s ease, padding 0.4s ease, border-color .4s ease;
+    border-bottom: 1px solid transparent;
+  }
+  header.scrolled{ background:rgba(11,11,12,0.88); backdrop-filter: blur(10px); padding:16px 40px; border-bottom: 1px solid var(--line); }
+  header.on-record-active{ background:rgba(11,11,12,0.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+
+  nav ul{ list-style:none; display:flex; gap:36px; }
+  nav a{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--paper-dim); position:relative; padding-bottom:4px; transition:color .25s ease;
+  }
+  nav a:hover{ color:var(--paper); }
+  nav a.active{ color:var(--orange); }
+  nav a::after{ content:''; position:absolute; left:0; bottom:0; width:0; height:1px; background:var(--orange); transition:width .25s ease; }
+  nav a:hover::after, nav a.active::after{ width:100%; }
+
+  .nav-cta{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.06em; text-transform:uppercase;
+    border:1px solid var(--line-strong); padding:9px 18px; border-radius:2px;
+    transition: border-color .25s ease, background .25s ease;
+  }
+  .nav-cta:hover{ border-color:var(--orange); background:rgba(255,90,31,0.08); }
+
+  /* ===================== VIEW SWITCHING ===================== */
+  #page-home, #page-onrecord{ display:none; }
+  #page-home.active, #page-onrecord.active{ display:block; }
+
+  /* ===================== HERO ===================== */
+  .hero{
+    position:relative; height:92vh; min-height:600px; max-height:880px;
+    display:flex; flex-direction:column; justify-content:center; overflow:hidden;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,90,31,0.09), transparent 60%),
+      linear-gradient(180deg, #08080a 0%, #0b0b0c 55%, #0b0b0c 100%);
+  }
+  .stage{ position:absolute; inset:0; z-index:0; }
+  .blueprint{ position:absolute; inset:0; width:100%; height:100%; opacity:0.5; }
+  .blueprint .bp-line{ fill:none; stroke:var(--paper); stroke-width:1; opacity:0.5; }
+  .blueprint .bp-line.accent{ stroke:var(--orange); opacity:0.7; }
+  .blueprint .bp-fill{ fill:rgba(255,90,31,0.05); stroke:var(--orange); stroke-width:1; opacity:0.6; }
+  .blueprint .bp-dim{ stroke:var(--paper-dim); stroke-width:0.6; opacity:0.35; }
+  .blueprint .bp-label{ fill:var(--paper-dim); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.05em; opacity:0.55; }
+  .blueprint .bp-label.accent{ fill:var(--orange); opacity:0.8; }
+  .blueprint .bp-draw{ stroke-dasharray:2400; stroke-dashoffset:2400; animation:bp-trace 9s ease-in-out infinite; }
+  .blueprint .bp-draw-delay1{ animation-delay:0.6s; }
+  .blueprint .bp-draw-delay2{ animation-delay:1.2s; }
+  .blueprint .bp-draw-delay3{ animation-delay:1.8s; }
+  .blueprint .bp-draw-delay4{ animation-delay:2.4s; }
+  @keyframes bp-trace{ 0%{stroke-dashoffset:2400} 35%{stroke-dashoffset:0} 85%{stroke-dashoffset:0;opacity:1} 100%{stroke-dashoffset:0;opacity:0.3} }
+  .blueprint .bp-fade{ opacity:0; animation:bp-fadein 9s ease-in-out infinite; }
+  @keyframes bp-fadein{ 0%,30%{opacity:0} 45%,85%{opacity:1} 100%{opacity:0} }
+  .blueprint .bp-crosshair{ stroke:var(--orange); stroke-width:0.8; opacity:0.6; }
+  .blueprint .bp-beam{ opacity:0; animation:bp-beam-pulse 9s ease-in-out infinite; }
+  @keyframes bp-beam-pulse{ 0%,42%{opacity:0} 58%{opacity:1} 82%{opacity:0.55} 100%{opacity:0} }
+  .scanline{ position:absolute; top:0; left:0; width:100%; height:2px; background:linear-gradient(90deg,transparent,rgba(255,90,31,0.5),transparent); animation:scan-move 7s ease-in-out infinite; opacity:0.6; }
+  @keyframes scan-move{ 0%{top:8%} 50%{top:88%} 100%{top:8%} }
+  .haze{ position:absolute; inset:0; background:radial-gradient(ellipse 80% 70% at 50% 50%,rgba(255,90,31,0.05),transparent 70%); animation:haze-pulse 8s ease-in-out infinite; }
+  @keyframes haze-pulse{ 0%,100%{opacity:0.7} 50%{opacity:1} }
+  .dust{ position:absolute; border-radius:50%; background:var(--paper); opacity:0; animation:rise linear infinite; }
+  @keyframes rise{ 0%{transform:translateY(0) translateX(0);opacity:0} 10%{opacity:0.45} 90%{opacity:0.15} 100%{transform:translateY(-100vh) translateX(20px);opacity:0} }
+  .grid-overlay{ position:absolute; inset:0; background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:80px 80px; opacity:0.22; mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,0.6) 60%,transparent); }
+  .hero-content{ position:relative; z-index:2; padding:0 40px; max-width:1280px; margin:0 auto; width:100%; }
+  .hero-tag{ font-family:var(--mono); font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--orange); margin-bottom:22px; display:flex; align-items:center; gap:10px; }
+  .pulse-dot{ width:7px; height:7px; border-radius:50%; background:var(--orange); animation:pulse 2s infinite; }
+  @keyframes pulse{ 0%{box-shadow:0 0 0 0 rgba(255,90,31,0.45)} 70%{box-shadow:0 0 0 9px rgba(255,90,31,0)} 100%{box-shadow:0 0 0 0 rgba(255,90,31,0)} }
+  h1.hero-headline{ font-family:var(--display); font-weight:700; font-size:clamp(42px,7vw,104px); line-height:0.98; letter-spacing:-0.025em; max-width:1100px; }
+  h1.hero-headline .accent{ color:var(--orange); }
+  .hero-foot{ display:flex; justify-content:space-between; align-items:flex-end; margin-top:40px; gap:40px; flex-wrap:wrap; }
+  .hero-desc{ max-width:440px; color:var(--paper-dim); font-size:16px; line-height:1.65; }
+  .hero-actions{ display:flex; gap:14px; flex-shrink:0; }
+  .btn{ font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; padding:15px 26px; border-radius:2px; display:inline-flex; align-items:center; gap:10px; transition:all .25s ease; white-space:nowrap; cursor:pointer; border:none; }
+  .btn-primary{ background:var(--orange); color:#000; font-weight:800; }
+  .btn-primary:hover{ background:#ff7240; transform:translateY(-1px); }
+  .btn-ghost{ border:1px solid var(--line-strong); color:var(--paper); background:none; }
+  .btn-ghost:hover{ border-color:var(--paper); background:rgba(255,255,255,0.04); }
+  .scroll-cue{ position:absolute; right:40px; bottom:36px; z-index:2; display:flex; flex-direction:column; align-items:center; gap:10px; font-family:var(--mono); font-size:10px; letter-spacing:0.2em; color:var(--paper-dim); text-transform:uppercase; }
+  .scroll-line{ width:1px; height:48px; background:linear-gradient(var(--paper-dim),transparent); position:relative; overflow:hidden; }
+  .scroll-line::after{ content:''; position:absolute; top:-100%; left:0; width:100%; height:100%; background:var(--orange); animation:scrolldown 2.2s ease-in-out infinite; }
+  @keyframes scrolldown{ 0%{top:-100%} 60%,100%{top:100%} }
+
+  /* ===================== MARQUEE ===================== */
+  .clients{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--black-2); padding:36px 0; overflow:hidden; -webkit-mask-image:linear-gradient(to right,transparent 0%,black 7%,black 93%,transparent 100%); mask-image:linear-gradient(to right,transparent 0%,black 7%,black 93%,transparent 100%); }
+  .clients .partners-track{ animation-duration:36s; }
+  .clients .partner-name-main{ font-size:13px; }
+  .clients .partner-name-sub{ font-size:8px; }
+
+  /* ===================== SECTIONS SHARED ===================== */
+  section{ padding:140px 0; position:relative; }
+  #upcoming{ padding-top:48px; padding-bottom:64px; }
+  #upcoming .section-head{ margin-bottom:36px; }
+  #why-us{ padding-bottom:32px; }
+  .testimonial{ border-top:1px solid var(--line); text-align:center; margin-top:80px; }
+  .section-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:40px; margin-bottom:64px; flex-wrap:wrap; }
+  h2.section-title{ font-family:var(--display); font-weight:700; font-size:clamp(30px,4.2vw,52px); line-height:1.05; letter-spacing:-0.02em; margin-top:14px; }
+  .section-note{ max-width:340px; color:var(--paper-dim); font-size:15px; line-height:1.6; text-align:right; }
+  @media(max-width:760px){ .section-note{text-align:left;} }
+
+  /* ===================== UPCOMING SLOTS ===================== */
+  .programme{ border-top:1px solid var(--line); }
+  .slot{ display:grid; grid-template-columns:112px 1fr auto; gap:20px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line); cursor:pointer; transition:padding .25s ease,background .25s ease; position:relative; }
+  .slot:hover{ padding-left:10px; background:rgba(255,90,31,0.03); }
+  .slot:hover .slot-thumb{ opacity:1; transform:scale(1); }
+  .slot:hover .slot-name{ color:var(--orange); }
+  .slot-time{ font-family:var(--mono); font-size:10px; color:var(--paper-dim); letter-spacing:0.03em; line-height:1.5; white-space:nowrap; }
+  .slot-time .dateline{ color:var(--orange); display:block; font-size:9px; letter-spacing:0.08em; margin-bottom:2px; }
+  .slot-main{ min-width:0; display:flex; align-items:baseline; gap:16px; flex-wrap:wrap; }
+  .slot-name{ font-family:var(--display); font-weight:700; font-size:16px; letter-spacing:-0.005em; transition:color .25s ease; line-height:1.3; white-space:nowrap; }
+  .slot-meta{ display:flex; gap:10px; flex-wrap:wrap; }
+  .tag{ font-family:var(--mono); font-size:9px; letter-spacing:0.06em; text-transform:uppercase; color:var(--steel); border:1px solid var(--line); padding:3px 7px; border-radius:2px; white-space:nowrap; }
+  .slot-thumb{ width:64px; height:44px; border-radius:3px; background-size:cover; background-position:center; opacity:0; transform:scale(0.9); transition:all .3s cubic-bezier(.2,.8,.2,1); position:relative; overflow:hidden; }
+  .slot-thumb::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg,transparent 40%,rgba(11,11,12,0.5)); }
+  .dateline.accent{ color:var(--orange); font-weight:600; }
+  .slot-upcoming{ border-bottom-style:dashed; border-color:var(--line-strong); }
+  .slot-upcoming:hover .slot-name{ color:var(--orange); }
+  .ph-upcoming{ background:transparent; border:1px dashed var(--line-strong); opacity:0.7; display:flex; align-items:center; justify-content:center; }
+  .ph-upcoming::after{ content:'COVERAGE PENDING'; position:absolute; font-family:var(--mono); font-size:9px; letter-spacing:0.12em; color:var(--steel); }
+  .slot-upcoming:hover .ph-upcoming{ border-color:var(--orange); opacity:1; }
+  /* events ticker */
+  .events-track-wrap{ overflow:hidden; -webkit-mask-image:linear-gradient(to right,transparent 0%,black 6%,black 94%,transparent 100%); mask-image:linear-gradient(to right,transparent 0%,black 6%,black 94%,transparent 100%); }
+  .events-track{ display:flex; align-items:center; width:max-content; animation:partner-ticker 30s linear infinite; }
+  .events-track:hover{ animation-play-state:paused; }
+  .event-tick-item{ display:inline-flex; flex-direction:column; padding:20px 80px; flex-shrink:0; opacity:0.85; transition:opacity .25s ease; }
+  .event-tick-item.has-link{ cursor:pointer; }
+  .event-tick-item.has-link:hover{ opacity:1; }
+  .event-tick-item.has-link:hover .event-tick-name{ color:var(--orange); }
+  .event-tick-date{ font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--orange); margin-bottom:8px; }
+  .event-tick-name{ font-family:var(--display); font-weight:700; font-size:34px; letter-spacing:-0.02em; color:var(--paper); line-height:1.1; white-space:nowrap; transition:color .25s ease; }
+  .event-tick-sub{ font-family:var(--mono); font-size:10px; letter-spacing:0.07em; text-transform:uppercase; color:var(--paper-dim); margin-top:8px; white-space:nowrap; }
+
+  /* ===================== STATS ===================== */
+  .stats{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:radial-gradient(ellipse 50% 100% at 0% 50%,rgba(255,90,31,0.05),transparent),var(--black-2); }
+  .stats-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); }
+  .stat{ background:var(--black-2); padding:48px 36px; }
+  .stat-num{ font-family:var(--display); font-weight:700; font-size:clamp(34px,4vw,50px); color:var(--orange); display:flex; align-items:baseline; gap:4px; }
+  .stat-num span.unit{ font-size:19px; color:var(--paper-dim); font-family:var(--mono); font-weight:400; }
+  .stat-num.is-word{ font-size:clamp(26px,3vw,38px); }
+  .stat-label{ margin-top:10px; font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--paper-dim); }
+  @media(max-width:880px){ .stats-grid{grid-template-columns:repeat(2,1fr);} }
+
+  /* ===================== APPROACH ===================== */
+  .approach-strip{ display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:4px; overflow:hidden; }
+  .approach-tile{ background:var(--black); padding:28px 22px; transition:background .25s ease; }
+  .approach-tile:hover{ background:var(--black-2); }
+  .approach-tile:hover .approach-icon{ color:var(--orange); border-color:var(--orange); }
+  .approach-icon{ width:28px; height:28px; border:1px solid var(--line-strong); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11px; color:var(--paper-dim); margin-bottom:18px; transition:all .25s ease; }
+  .approach-title{ font-family:var(--display); font-weight:700; font-size:15px; letter-spacing:-0.005em; margin-bottom:8px; line-height:1.3; }
+  .approach-body{ color:var(--paper-dim); font-size:13px; line-height:1.55; }
+  @media(max-width:980px){ .approach-strip{grid-template-columns:repeat(3,1fr);} }
+  @media(max-width:620px){ .approach-strip{grid-template-columns:repeat(2,1fr);} }
+
+  /* ===================== TESTIMONIAL ===================== */
+  .testimonial{ text-align:center; }
+  .quote-mark{ font-family:var(--display); font-size:76px; color:var(--orange-dim); line-height:1; margin-bottom:10px; }
+  blockquote{ font-family:var(--display); font-weight:600; font-size:clamp(23px,3.2vw,38px); line-height:1.32; max-width:920px; margin:0 auto; letter-spacing:-0.015em; }
+  .quote-attr{ margin-top:32px; font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--paper-dim); }
+  .quote-attr span{ color:var(--orange); }
+
+  /* ===================== CTA ===================== */
+  /* partners ticker */
+  .partners{ padding:64px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .partners .eyebrow{ justify-content:center; margin-bottom:44px; }
+  #upcoming{ padding-top:100px; }
+  #upcoming .section-head{ margin-bottom:52px; }
+  .partners-track-wrap{ overflow:hidden; -webkit-mask-image:linear-gradient(to right,transparent 0%,black 8%,black 92%,transparent 100%); mask-image:linear-gradient(to right,transparent 0%,black 8%,black 92%,transparent 100%); }
+  .partners-track{ display:flex; align-items:center; width:max-content; animation:partner-ticker 48s linear infinite; }
+  .partners-track:hover{ animation-play-state:paused; }
+  @keyframes partner-ticker{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .partner-item{ display:inline-flex; align-items:center; gap:14px; padding:0 52px; flex-shrink:0; opacity:0.75; transition:opacity .25s ease; cursor:default; }
+  .partner-item:hover{ opacity:1; }
+  .partner-detail{ display:flex; flex-direction:column; }
+  .partner-name-main{ font-family:var(--display); font-weight:700; font-size:15px; color:var(--paper); letter-spacing:-0.01em; line-height:1.1; white-space:nowrap; }
+  .partner-name-sub{ font-family:var(--mono); font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--paper-dim); line-height:1.5; white-space:nowrap; margin-top:3px; }
+  .p-sep{ display:inline-block; width:1px; height:36px; background:var(--line-strong); flex-shrink:0; }
+  /* linkedin */
+  .linkedin-btn{ display:inline-flex; align-items:center; gap:7px; color:var(--steel); font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-decoration:none; transition:color .2s ease; }
+  .linkedin-btn:hover{ color:var(--paper); }
+  .cta-section{ border-top:1px solid var(--line); position:relative; overflow:hidden; }
+  .cta-section::before{ content:''; position:absolute; top:-30%; left:50%; width:600px; height:600px; background:radial-gradient(circle,rgba(255,90,31,0.13),transparent 65%); transform:translateX(-50%); pointer-events:none; }
+  .cta-inner{ position:relative; z-index:1; text-align:center; display:flex; flex-direction:column; align-items:center; }
+  .cta-inner .eyebrow{ justify-content:center; margin-bottom:20px; }
+  .cta-inner .eyebrow::before{ display:none; }
+  h2.cta-headline{ font-family:var(--display); font-weight:700; font-size:clamp(34px,5.6vw,74px); letter-spacing:-0.025em; line-height:1.02; max-width:900px; }
+  .cta-sub{ margin-top:22px; color:var(--paper-dim); font-size:16px; max-width:480px; }
+  .cta-actions{ margin-top:40px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+
+  /* ===================== FOOTER ===================== */
+  footer{ border-top:1px solid var(--line); padding:64px 0 36px; }
+  .footer-top{ display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; gap:40px; padding-bottom:56px; align-items:start; }
+  .footer-brand p{ color:var(--paper-dim); font-size:13px; line-height:1.65; max-width:200px; margin-top:18px; }
+  .footer-col h4{ font-family:var(--mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--steel); margin-bottom:18px; }
+  .footer-col ul{ list-style:none; display:flex; flex-direction:column; gap:11px; }
+  .footer-col li{ color:var(--paper-dim); font-size:13px; line-height:1.5; }
+  .footer-col a{ color:var(--paper-dim); font-size:13px; transition:color .2s ease; }
+  .footer-col a:hover{ color:var(--orange); }
+  .footer-col .addr{ color:var(--paper-dim); font-size:13px; line-height:1.7; }
+  .footer-bottom{ border-top:1px solid var(--line); padding-top:28px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; font-family:var(--mono); font-size:11px; letter-spacing:0.05em; color:var(--steel); text-transform:uppercase; }
+  @media(max-width:760px){ .footer-top{grid-template-columns:1fr 1fr;} .footer-brand{grid-column:1/-1;} }
+
+  /* ===================== ON RECORD PAGE ===================== */
+  .page-header{ padding:160px 0 56px; border-bottom:1px solid var(--line); position:relative; overflow:hidden; }
+  .page-header::before{ content:''; position:absolute; top:-40%; left:-10%; width:600px; height:600px; background:radial-gradient(circle,rgba(255,90,31,0.07),transparent 65%); pointer-events:none; }
+  .page-header-inner{ position:relative; z-index:1; }
+  .page-header-content{ display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:start; margin-top:18px; }
+  .page-header h1{ font-family:var(--display); font-weight:700; font-size:clamp(42px,7vw,88px); line-height:0.98; letter-spacing:-0.025em; }
+  .page-header-sub{ color:var(--paper-dim); font-size:15px; line-height:1.65; max-width:480px; }
+  .page-header-meta{ margin-top:28px; display:flex; gap:28px; flex-wrap:wrap; }
+  .meta-item{ font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--steel); }
+  .meta-item span{ color:var(--paper); }
+  @media(max-width:760px){ .page-header-content{ grid-template-columns:1fr; gap:24px; } }
+
+  /* filter bars */
+  .filter-bar{ display:flex; align-items:center; gap:10px; padding:18px 0; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .filter-bar + .filter-bar{ border-top:none; padding-top:14px; }
+  .filter-label{ font-family:var(--mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--steel); margin-right:4px; min-width:60px; }
+  .filter-btn{ font-family:var(--mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--paper-dim); border:1px solid var(--line); padding:5px 12px; border-radius:2px; background:none; cursor:pointer; transition:all .2s ease; }
+  .filter-btn:hover{ border-color:var(--line-strong); color:var(--paper); }
+  .filter-btn.active{ border-color:var(--orange); color:var(--orange); background:rgba(255,90,31,0.06); }
+  .filter-btn:disabled{ opacity:0.35; cursor:default; border-color:var(--line); color:var(--steel); background:none; }
+  .tag.cat-badge{ background:rgba(255,90,31,0.07); border-color:rgba(255,90,31,0.2); color:var(--orange); }
+
+  /* expandable event rows */
+  .event-row{ border-bottom:1px solid var(--line); }
+  .event-trigger{ display:grid; grid-template-columns:120px 1fr auto; gap:20px; align-items:center; padding:18px 0; cursor:pointer; user-select:none; transition:padding .2s ease, background .2s ease; }
+  .event-trigger:hover{ background:rgba(255,90,31,0.03); padding-left:10px; }
+  .event-row.is-open .event-trigger{ background:rgba(255,90,31,0.05); padding-left:10px; }
+  .event-row.is-open .er-name{ color:var(--orange); }
+
+  .er-time{ font-family:var(--mono); font-size:10px; color:var(--paper-dim); letter-spacing:0.03em; line-height:1.5; white-space:nowrap; }
+  .er-time .dateline{ color:var(--orange); display:block; font-size:9px; letter-spacing:0.08em; margin-bottom:2px; }
+  .er-main{ min-width:0; }
+  .er-name{ font-family:var(--display); font-weight:700; font-size:17px; letter-spacing:-0.005em; line-height:1.3; transition:color .2s ease; }
+  .er-meta{ display:flex; gap:8px; flex-wrap:wrap; margin-top:7px; }
+
+  /* expand toggle */
+  .expand-toggle{ display:flex; align-items:center; gap:12px; flex-shrink:0; }
+  .expand-hint{ font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--steel); transition:color .2s ease; white-space:nowrap; }
+  .event-trigger:hover .expand-hint, .event-row.is-open .expand-hint{ color:var(--orange); }
+
+  .expand-icon{ width:30px; height:30px; border:1px solid var(--line-strong); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .25s ease; position:relative; }
+  .expand-icon::before, .expand-icon::after{ content:''; position:absolute; background:var(--paper-dim); border-radius:1px; transition:all .3s ease; }
+  .expand-icon::before{ width:10px; height:1px; }
+  .expand-icon::after{ width:1px; height:10px; }
+  .event-trigger:hover .expand-icon{ border-color:var(--orange); }
+  .event-row.is-open .expand-icon{ border-color:var(--orange); background:rgba(255,90,31,0.1); transform:rotate(45deg); }
+  .event-row.is-open .expand-icon::before, .event-row.is-open .expand-icon::after{ background:var(--orange); }
+
+  /* photo panel */
+  .photo-panel{ overflow:hidden; max-height:0; transition:max-height .5s cubic-bezier(.4,0,.2,1); }
+  .event-row.is-open .photo-panel{ max-height:1400px; }
+  .photo-panel-inner{ padding:10px 0 36px; }
+
+  .photo-count-bar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .photo-count-label{ font-family:var(--mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--steel); }
+  .photo-count-label em{ color:var(--orange); font-style:normal; }
+
+  .collapse-btn{ font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--paper-dim); background:none; border:1px solid var(--line); padding:5px 14px; border-radius:2px; cursor:pointer; transition:all .2s ease; display:flex; align-items:center; gap:7px; }
+  .collapse-btn:hover{ border-color:var(--line-strong); color:var(--paper); }
+  .collapse-btn svg{ width:10px; height:10px; stroke:currentColor; fill:none; stroke-width:1.5; }
+
+  .photo-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+
+  .photo-card{ aspect-ratio:3/2; border-radius:3px; overflow:hidden; position:relative; cursor:pointer; background:var(--black-2); }
+  .photo-card img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .4s cubic-bezier(.2,.8,.2,1), filter .3s ease; filter:saturate(0.8) brightness(0.9); }
+  .photo-card:hover img{ transform:scale(1.06); filter:saturate(1) brightness(1); }
+  .photo-card .photo-overlay{ position:absolute; inset:0; background:linear-gradient(180deg,transparent 55%,rgba(11,11,12,0.75)); opacity:0; transition:opacity .3s ease; display:flex; align-items:flex-end; padding:8px 10px; }
+  .photo-card:hover .photo-overlay{ opacity:1; }
+  .photo-num{ font-family:var(--mono); font-size:9px; letter-spacing:0.1em; color:var(--paper-dim); }
+  .photo-card.loading{ background:linear-gradient(90deg,var(--black-2) 25%,rgba(255,90,31,0.04) 50%,var(--black-2) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; }
+  @keyframes shimmer{ 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* lightbox */
+  .lightbox{ position:fixed; inset:0; background:rgba(11,11,12,0.97); z-index:200; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .3s ease; backdrop-filter:blur(8px); }
+  .lightbox.active{ opacity:1; pointer-events:all; }
+  .lightbox-img{ max-width:88vw; max-height:84vh; object-fit:contain; border-radius:3px; }
+  .lightbox-close{ position:absolute; top:28px; right:32px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--paper-dim); background:none; border:1px solid var(--line-strong); padding:7px 16px; border-radius:2px; cursor:pointer; transition:all .2s ease; }
+  .lightbox-close:hover{ border-color:var(--paper); color:var(--paper); }
+  .lightbox-nav{ position:absolute; top:50%; transform:translateY(-50%); background:none; border:1px solid var(--line-strong); color:var(--paper-dim); width:44px; height:44px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s ease; }
+  .lightbox-nav:hover{ border-color:var(--orange); color:var(--orange); }
+  .lightbox-prev{ left:32px; }
+  .lightbox-next{ right:32px; }
+  .lightbox-counter{ position:absolute; bottom:28px; font-family:var(--mono); font-size:11px; letter-spacing:0.1em; color:var(--steel); }
+
+  /* ===================== RESPONSIVE ===================== */
+  @media(max-width:880px){
+    nav, .nav-cta{ display:none; }
+    .wrap{ padding:0 22px; }
+    header{ padding:22px; }
+    section{ padding:90px 0; }
+    .photo-grid{ grid-template-columns:repeat(2,1fr); }
+    .event-trigger{ grid-template-columns:80px 1fr auto; }
+    .expand-hint{ display:none; }
+    .slot{ grid-template-columns:80px 1fr; padding:12px 0; }
+    .slot-thumb{ display:none; }
+    .slot-main{ flex-direction:column; align-items:flex-start; gap:4px; }
+  }
+  @media(prefers-reduced-motion:reduce){ *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;} }
+</style>
+</head>
+<body>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lbClose">Close ✕</button>
+  <button class="lightbox-nav lightbox-prev" id="lbPrev">‹</button>
+  <img class="lightbox-img" id="lbImg" src="" alt="">
+  <button class="lightbox-nav lightbox-next" id="lbNext">›</button>
+  <span class="lightbox-counter" id="lbCounter"></span>
+</div>
+
+<!-- SHARED HEADER -->
+<header id="siteHeader">
+  <div class="wordmark" id="logoLink">
+    <span class="kicker">PHOTO AGENCY</span>
+    <span class="name"><span class="mega">mega</span><span class="press">press</span></span>
+  </div>
+  <nav>
+    <ul>
+      <li><a href="#upcoming" id="navUpcoming">Coming Up</a></li>
+      <li><a href="#why-us" id="navApproach">Why us?</a></li>
+      <li><a href="#partners" id="navPartners">Partners</a></li>
+      <li><a href="#contact" id="navContact">Contact</a></li>
+      <li><a href="#on-record" id="navOnRecord">On Record</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════ HOME PAGE ═══════════════════════════════ -->
+<div id="page-home">
+
+  <section class="hero">
+    <div class="stage">
+      <div class="grid-overlay"></div>
+      <div class="haze"></div>
+      <div class="scanline"></div>
+      <svg class="blueprint" viewBox="0 0 1280 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- ── SITE PERIMETER ──────────────────────────────── -->
+        <rect class="bp-line bp-draw" x="62" y="86" width="1156" height="638" fill="none" pathLength="2400"/>
+
+        <!-- ── MAIN NORTH–SOUTH PROMENADE ─────────────────── -->
+        <line class="bp-dim bp-draw bp-draw-delay1" x1="610" y1="86" x2="610" y2="660" pathLength="2400"/>
+        <line class="bp-dim bp-draw bp-draw-delay1" x1="670" y1="86" x2="670" y2="660" pathLength="2400"/>
+        <!-- centre dashes -->
+        <line class="bp-draw bp-draw-delay1" x1="640" y1="86" x2="640" y2="660"
+              stroke="rgba(242,241,238,0.06)" stroke-width="0.5" stroke-dasharray="10 7" pathLength="2400"/>
+
+        <!-- ── EAST–WEST CROSS PROMENADE ──────────────────── -->
+        <line class="bp-dim bp-draw bp-draw-delay1" x1="62" y1="392" x2="610" y2="392" pathLength="2400"/>
+        <line class="bp-dim bp-draw bp-draw-delay1" x1="62" y1="432" x2="610" y2="432" pathLength="2400"/>
+        <line class="bp-dim bp-draw bp-draw-delay1" x1="670" y1="392" x2="1218" y2="392" pathLength="2400"/>
+        <line class="bp-dim bp-draw bp-draw-delay1" x1="670" y1="432" x2="1218" y2="432" pathLength="2400"/>
+        <!-- centre dashes -->
+        <line class="bp-draw bp-draw-delay1" x1="62" y1="412" x2="1218" y2="412"
+              stroke="rgba(242,241,238,0.06)" stroke-width="0.5" stroke-dasharray="10 7" pathLength="2400"/>
+
+        <!-- ── ENTRANCE GATE (bottom, main axis) ──────────── -->
+        <g class="bp-draw bp-draw-delay1" fill="none" stroke="rgba(242,241,238,0.45)" stroke-width="1">
+          <!-- gate pylons -->
+          <rect x="606" y="698" width="14" height="26"/>
+          <rect x="660" y="698" width="14" height="26"/>
+          <!-- gate lintel -->
+          <line x1="600" y1="700" x2="680" y2="700"/>
+          <!-- arch -->
+          <path d="M600 700 Q640 676 680 700" stroke-width="0.8"/>
+          <!-- gate road -->
+          <line x1="620" y1="724" x2="620" y2="750" stroke-width="0.5" stroke="rgba(242,241,238,0.2)"/>
+          <line x1="660" y1="724" x2="660" y2="750" stroke-width="0.5" stroke="rgba(242,241,238,0.2)"/>
+        </g>
+
+        <!-- ── FOUNTAIN / PLAZA at promenade crossing ─────── -->
+        <g class="bp-fade">
+          <circle cx="640" cy="412" r="32" fill="none" stroke="rgba(242,241,238,0.18)" stroke-width="0.7"/>
+          <circle cx="640" cy="412" r="18" fill="none" stroke="rgba(242,241,238,0.12)" stroke-width="0.5"/>
+          <circle cx="640" cy="412" r="6" fill="rgba(255,90,31,0.1)" stroke="#ff5a1f" stroke-width="0.6"/>
+          <line x1="640" y1="380" x2="640" y2="444" stroke="rgba(242,241,238,0.08)" stroke-width="0.4"/>
+          <line x1="608" y1="412" x2="672" y2="412" stroke="rgba(242,241,238,0.08)" stroke-width="0.4"/>
+        </g>
+
+        <!-- ════════════════════════════════════════════════════
+             NW QUADRANT — PAVILION 1  (large main hall)
+             ════════════════════════════════════════════════════ -->
+        <rect class="bp-line bp-draw bp-draw-delay1" x="82" y="106" width="508" height="266" fill="none" pathLength="2400"/>
+        <!-- structural column grid P1 -->
+        <g class="bp-fade" fill="none">
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="150" y="148" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="248" y="148" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="346" y="148" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="444" y="148" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="542" y="148" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="150" y="222" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="248" y="222" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="346" y="222" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="444" y="222" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="542" y="222" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="150" y="310" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="248" y="310" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="346" y="310" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="444" y="310" width="8" height="8"/>
+          <rect stroke="rgba(242,241,238,0.22)" stroke-width="0.6" x="542" y="310" width="8" height="8"/>
+          <!-- structural bay lines -->
+          <line x1="82" y1="196" x2="590" y2="196" stroke="rgba(242,241,238,0.05)" stroke-width="0.4"/>
+          <line x1="82" y1="274" x2="590" y2="274" stroke="rgba(242,241,238,0.05)" stroke-width="0.4"/>
+          <line x1="200" y1="106" x2="200" y2="372" stroke="rgba(242,241,238,0.05)" stroke-width="0.4"/>
+          <line x1="298" y1="106" x2="298" y2="372" stroke="rgba(242,241,238,0.05)" stroke-width="0.4"/>
+          <line x1="396" y1="106" x2="396" y2="372" stroke="rgba(242,241,238,0.05)" stroke-width="0.4"/>
+          <line x1="494" y1="106" x2="494" y2="372" stroke="rgba(242,241,238,0.05)" stroke-width="0.4"/>
+          <!-- entry notch -->
+          <rect x="280" y="368" width="80" height="5" fill="rgba(242,241,238,0.12)" stroke="none"/>
+        </g>
+
+        <!-- ════════════════════════════════════════════════════
+             NE QUADRANT — PAVILIONS 2, 3, 4
+             ════════════════════════════════════════════════════ -->
+        <!-- Pavilion 2 -->
+        <rect class="bp-line bp-draw bp-draw-delay2" x="690" y="106" width="240" height="136" fill="none" pathLength="2400"/>
+        <g class="bp-fade" fill="none">
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="744" y="140" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="820" y="140" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="896" y="140" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="744" y="200" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="820" y="200" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="896" y="200" width="7" height="7"/>
+        </g>
+        <!-- Pavilion 3 -->
+        <rect class="bp-line bp-draw bp-draw-delay2" x="950" y="106" width="248" height="136" fill="none" pathLength="2400"/>
+        <g class="bp-fade" fill="none">
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1004" y="140" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1074" y="140" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1144" y="140" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1004" y="198" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1074" y="198" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1144" y="198" width="7" height="7"/>
+        </g>
+        <!-- Pavilion 4 (long, spans NE) -->
+        <rect class="bp-line bp-draw bp-draw-delay2" x="690" y="262" width="508" height="110" fill="none" pathLength="2400"/>
+        <g class="bp-fade" fill="none">
+          <line x1="840" y1="262" x2="840" y2="372" stroke="rgba(242,241,238,0.07)" stroke-width="0.5"/>
+          <line x1="990" y1="262" x2="990" y2="372" stroke="rgba(242,241,238,0.07)" stroke-width="0.5"/>
+          <line x1="1120" y1="262" x2="1120" y2="372" stroke="rgba(242,241,238,0.07)" stroke-width="0.5"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="750" y="298" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="900" y="298" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1050" y="298" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1170" y="298" width="7" height="7"/>
+        </g>
+
+        <!-- ════════════════════════════════════════════════════
+             SW QUADRANT — PAVILIONS 5, 6 + OUTDOOR
+             ════════════════════════════════════════════════════ -->
+        <!-- Pavilion 5 -->
+        <rect class="bp-line bp-draw bp-draw-delay2" x="82" y="452" width="218" height="196" fill="none" pathLength="2400"/>
+        <g class="bp-fade" fill="none">
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="136" y="498" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="226" y="498" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="136" y="578" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="226" y="578" width="7" height="7"/>
+        </g>
+        <!-- Pavilion 6 -->
+        <rect class="bp-line bp-draw bp-draw-delay2" x="320" y="452" width="270" height="122" fill="none" pathLength="2400"/>
+        <g class="bp-fade" fill="none">
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="378" y="492" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="454" y="492" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="530" y="492" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="378" y="532" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="454" y="532" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="530" y="532" width="7" height="7"/>
+        </g>
+        <!-- Outdoor SW (dashed) -->
+        <rect class="bp-draw bp-draw-delay3" x="320" y="594" width="270" height="54" fill="none"
+              stroke="rgba(242,241,238,0.2)" stroke-width="0.6" stroke-dasharray="6 4" pathLength="2400"/>
+
+        <!-- ════════════════════════════════════════════════════
+             SE QUADRANT — PAVILIONS 7, 8 + HELIPAD
+             ════════════════════════════════════════════════════ -->
+        <!-- Pavilion 7 (largest SE) -->
+        <rect class="bp-line bp-draw bp-draw-delay2" x="690" y="452" width="282" height="206" fill="none" pathLength="2400"/>
+        <g class="bp-fade" fill="none">
+          <line x1="770" y1="452" x2="770" y2="658" stroke="rgba(242,241,238,0.06)" stroke-width="0.4"/>
+          <line x1="850" y1="452" x2="850" y2="658" stroke="rgba(242,241,238,0.06)" stroke-width="0.4"/>
+          <line x1="690" y1="524" x2="972" y2="524" stroke="rgba(242,241,238,0.06)" stroke-width="0.4"/>
+          <line x1="690" y1="590" x2="972" y2="590" stroke="rgba(242,241,238,0.06)" stroke-width="0.4"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="730" y="484" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="810" y="484" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="890" y="484" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="730" y="558" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="810" y="558" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="890" y="558" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="730" y="624" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="810" y="624" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="890" y="624" width="7" height="7"/>
+        </g>
+        <!-- Pavilion 8 -->
+        <rect class="bp-line bp-draw bp-draw-delay3" x="992" y="452" width="206" height="122" fill="none" pathLength="2400"/>
+        <g class="bp-fade" fill="none">
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1040" y="490" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1120" y="490" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1040" y="540" width="7" height="7"/>
+          <rect stroke="rgba(242,241,238,0.2)" stroke-width="0.6" x="1120" y="540" width="7" height="7"/>
+        </g>
+        <!-- Helipad -->
+        <g class="bp-fade" fill="none">
+          <circle cx="1095" cy="600" r="44" stroke="rgba(242,241,238,0.18)" stroke-width="0.7"/>
+          <circle cx="1095" cy="600" r="34" stroke="rgba(242,241,238,0.1)" stroke-width="0.5"/>
+          <line x1="1095" y1="566" x2="1095" y2="634" stroke="rgba(242,241,238,0.14)" stroke-width="0.5"/>
+          <line x1="1061" y1="600" x2="1129" y2="600" stroke="rgba(242,241,238,0.14)" stroke-width="0.5"/>
+          <text x="1095" y="605" font-size="16" fill="rgba(242,241,238,0.18)" text-anchor="middle"
+                font-family="JetBrains Mono, monospace" letter-spacing="0.02em">H</text>
+        </g>
+
+        <!-- ── TREES along promenades ──────────────────────── -->
+        <g class="bp-fade" fill="none" stroke="rgba(242,241,238,0.13)" stroke-width="0.6">
+          <!-- N–S spine -->
+          <circle cx="640" cy="148" r="9"/><circle cx="640" cy="148" r="4"/>
+          <circle cx="640" cy="220" r="9"/><circle cx="640" cy="220" r="4"/>
+          <circle cx="640" cy="310" r="9"/><circle cx="640" cy="310" r="4"/>
+          <circle cx="640" cy="490" r="9"/><circle cx="640" cy="490" r="4"/>
+          <circle cx="640" cy="560" r="9"/><circle cx="640" cy="560" r="4"/>
+          <circle cx="640" cy="630" r="9"/><circle cx="640" cy="630" r="4"/>
+          <!-- E–W cross -->
+          <circle cx="200" cy="412" r="9"/><circle cx="200" cy="412" r="4"/>
+          <circle cx="380" cy="412" r="9"/><circle cx="380" cy="412" r="4"/>
+          <circle cx="520" cy="412" r="9"/><circle cx="520" cy="412" r="4"/>
+          <circle cx="790" cy="412" r="9"/><circle cx="790" cy="412" r="4"/>
+          <circle cx="920" cy="412" r="9"/><circle cx="920" cy="412" r="4"/>
+          <circle cx="1050" cy="412" r="9"/><circle cx="1050" cy="412" r="4"/>
+          <circle cx="1160" cy="412" r="9"/><circle cx="1160" cy="412" r="4"/>
+        </g>
+
+        <!-- ── CAMERA CROSSHAIRS (at entrance) ───────────────  -->
+        <g class="bp-fade">
+          <circle class="bp-crosshair" cx="600" cy="756" r="13" fill="none"/>
+          <line class="bp-crosshair" x1="600" y1="744" x2="600" y2="768"/>
+          <line class="bp-crosshair" x1="587" y1="756" x2="613" y2="756"/>
+          <circle class="bp-crosshair" cx="680" cy="756" r="13" fill="none"/>
+          <line class="bp-crosshair" x1="680" y1="744" x2="680" y2="768"/>
+          <line class="bp-crosshair" x1="667" y1="756" x2="693" y2="756"/>
+        </g>
+
+        <!-- ── DIMENSION LINES ─────────────────────────────── -->
+        <g class="bp-fade" stroke="rgba(242,241,238,0.11)" stroke-width="0.5" fill="none">
+          <line x1="62" y1="770" x2="1218" y2="770"/>
+          <line x1="62" y1="762" x2="62" y2="778"/>
+          <line x1="1218" y1="762" x2="1218" y2="778"/>
+          <line x1="28" y1="86" x2="28" y2="724"/>
+          <line x1="20" y1="86" x2="36" y2="86"/>
+          <line x1="20" y1="724" x2="36" y2="724"/>
+        </g>
+
+        <!-- ── LABELS ──────────────────────────────────────── -->
+        <g class="bp-fade" font-family="JetBrains Mono, monospace">
+          <text x="336" y="244" font-size="9" fill="rgba(242,241,238,0.35)" text-anchor="middle" letter-spacing="0.09em">PAVILION 1</text>
+          <text x="810" y="176" font-size="8" fill="rgba(242,241,238,0.3)" text-anchor="middle" letter-spacing="0.08em">PAV. 2</text>
+          <text x="1074" y="176" font-size="8" fill="rgba(242,241,238,0.3)" text-anchor="middle" letter-spacing="0.08em">PAV. 3</text>
+          <text x="944" y="320" font-size="8" fill="rgba(242,241,238,0.3)" text-anchor="middle" letter-spacing="0.08em">PAVILION 4</text>
+          <text x="191" y="548" font-size="8" fill="rgba(242,241,238,0.28)" text-anchor="middle" letter-spacing="0.08em">PAV. 5</text>
+          <text x="455" y="510" font-size="8" fill="rgba(242,241,238,0.28)" text-anchor="middle" letter-spacing="0.08em">PAV. 6</text>
+          <text x="831" y="558" font-size="8" fill="rgba(242,241,238,0.3)" text-anchor="middle" letter-spacing="0.08em">PAVILION 7</text>
+          <text x="1095" y="510" font-size="8" fill="rgba(242,241,238,0.28)" text-anchor="middle" letter-spacing="0.08em">PAV. 8</text>
+          <text x="455" y="622" font-size="7" fill="rgba(242,241,238,0.18)" text-anchor="middle" letter-spacing="0.07em">OUTDOOR EXHIBITION</text>
+          <!-- entrance label -->
+          <text x="640" y="748" font-size="7" fill="rgba(255,90,31,0.45)" text-anchor="middle" letter-spacing="0.1em">PRESS GATE</text>
+          <!-- dimension values -->
+          <text x="640" y="786" font-size="8" fill="rgba(242,241,238,0.2)" text-anchor="middle" letter-spacing="0.05em">148.0 M</text>
+          <text x="14" y="406" font-size="8" fill="rgba(242,241,238,0.2)" text-anchor="middle" transform="rotate(-90,14,406)" letter-spacing="0.05em">82.0 M</text>
+        </g>
+
+        <!-- orange accent dots at axis terminations -->
+        <g class="bp-fade">
+          <circle cx="640" cy="86" r="3" fill="#ff5a1f" opacity="0.35"/>
+          <circle cx="640" cy="724" r="3" fill="#ff5a1f" opacity="0.35"/>
+          <circle cx="62" cy="412" r="3" fill="#ff5a1f" opacity="0.35"/>
+          <circle cx="1218" cy="412" r="3" fill="#ff5a1f" opacity="0.35"/>
+        </g>
+
+        <!-- ── TITLE BLOCK ──────────────────────────────────── -->
+        <g class="bp-fade">
+          <rect x="62" y="736" width="380" height="1.5" fill="#ff5a1f" opacity="0.32"/>
+          <text x="62" y="754" font-family="JetBrains Mono, monospace" font-size="10" fill="#ff5a1f" letter-spacing="0.08em">THESSALONIKI INT'L EXHIBITION CENTRE</text>
+          <text x="62" y="768" font-family="JetBrains Mono, monospace" font-size="8" fill="rgba(242,241,238,0.26)" letter-spacing="0.05em">SITE PLAN — ALL PAVILIONS  ·  SCALE 1:1000  ·  REV. A</text>
+        </g>
+
+      </svg>
+      <div id="dustField"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-tag"><span class="pulse-dot"></span> Based in Thessaloniki — working worldwide</div>
+      <h1 class="hero-headline">The story behind <span class="accent">every stage.</span></h1>
+      <div class="hero-foot">
+        <p class="hero-desc">Megapress covers conferences, summits and exhibition floors for organisers, brands and press teams — fast, unobtrusive, and built around your run-of-show.</p>
+        <div class="hero-actions">
+          <a href="#on-record" class="btn btn-primary" id="heroWorkBtn">On Record →</a>
+          <a href="#contact" class="btn btn-ghost" id="heroContactBtn">Reach the desk →</a>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-cue"><span>Scroll</span><span class="scroll-line"></span></div>
+  </section>
+
+  <div class="clients">
+    <div class="partners-track-wrap" style="-webkit-mask-image:none;mask-image:none;">
+      <div class="partners-track">
+
+        <!-- set 1 -->
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">TIF — Helexpo</div><div class="partner-name-sub">International Fair</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Artozyma</div><div class="partner-name-sub">Bakery &amp; Confectionery</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Agrotica</div><div class="partner-name-sub">Agricultural Expo</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Philoxenia — Hotelia</div><div class="partner-name-sub">Hospitality &amp; Tourism</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Thessaloniki Film Festival</div><div class="partner-name-sub">International Cinema</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Documentary Festival</div><div class="partner-name-sub">Short Film &amp; Doc</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Book Fair</div><div class="partner-name-sub">Thessaloniki Int'l</div></div>
+        </div>
+        <span class="p-sep"></span>
+
+        <!-- set 2 — duplicate for seamless loop -->
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">TIF — Helexpo</div><div class="partner-name-sub">International Fair</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Artozyma</div><div class="partner-name-sub">Bakery &amp; Confectionery</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Agrotica</div><div class="partner-name-sub">Agricultural Expo</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Philoxenia — Hotelia</div><div class="partner-name-sub">Hospitality &amp; Tourism</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Thessaloniki Film Festival</div><div class="partner-name-sub">International Cinema</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Documentary Festival</div><div class="partner-name-sub">Short Film &amp; Doc</div></div>
+        </div>
+        <span class="p-sep"></span>
+        <div class="partner-item">
+          <div class="partner-detail"><div class="partner-name-main">Book Fair</div><div class="partner-name-sub">Thessaloniki Int'l</div></div>
+        </div>
+        <span class="p-sep"></span>
+
+      </div>
+    </div>
+  </div>
+
+  <section id="upcoming">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">On the calendar</p>
+          <h2 class="section-title">Coming up</h2>
+        </div>
+        <p class="section-note">Confirmed dates later this year — booking now for accreditation, press kits and floor coverage.</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="programme">
+        <div class="slot slot-upcoming">
+          <div class="slot-time"><span class="dateline accent">5–13 SEP</span>2026</div>
+          <div class="slot-main">
+            <div class="slot-name">Thessaloniki International Fair — 90th, Centenary</div>
+            <div class="slot-meta"><span class="tag">Japan — Honoured Country</span><span class="tag">Booking now</span></div>
+          </div>
+        </div>
+        <div class="slot slot-upcoming">
+          <div class="slot-time"><span class="dateline accent">13–15 NOV</span>2026</div>
+          <div class="slot-main">
+            <div class="slot-name">Philoxenia – Hotelia</div>
+            <div class="slot-meta"><span class="tag">300+ exhibitors</span><span class="tag">Booking now</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="why-us">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">The case</p>
+          <h2 class="section-title">Why a specialist?</h2>
+        </div>
+        <p class="section-note">Conferences don't pause for photography. Coverage is planned against the run-of-show, not bolted on after it.</p>
+      </div>
+      <div class="approach-strip">
+        <div class="approach-tile"><div class="approach-icon">A</div><div class="approach-title">Run-of-show briefing</div><p class="approach-body">Every keynote, panel and embargo mapped before doors open.</p></div>
+        <div class="approach-tile"><div class="approach-icon">B</div><div class="approach-title">Stage-light fluency</div><p class="approach-body">Moving spots, LED walls, pyro — exposure built around them, not fighting them.</p></div>
+        <div class="approach-tile"><div class="approach-icon">C</div><div class="approach-title">Floor-level coverage</div><p class="approach-body">Exhibition booths get the same attention as the main stage.</p></div>
+        <div class="approach-tile"><div class="approach-icon">D</div><div class="approach-title">Same-day delivery</div><p class="approach-body">A culled, edited gallery within 24 hours, sooner on request.</p></div>
+        <div class="approach-tile"><div class="approach-icon">E</div><div class="approach-title">On location, anywhere</div><p class="approach-body">Based in Thessaloniki, travelling across Greece and abroad.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="wrap">
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-num">15<span class="unit">yrs</span></div><div class="stat-label">Behind the lens</div></div>
+        <div class="stat"><div class="stat-num">500<span class="unit">+</span></div><div class="stat-label">Events covered</div></div>
+        <div class="stat"><div class="stat-num">24<span class="unit">hr</span></div><div class="stat-label">Standard turnaround</div></div>
+        <div class="stat"><div class="stat-num is-word">Global</div><div class="stat-label">Availability</div></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="partners" id="partners">
+    <div class="wrap">
+      <p class="eyebrow">Official Partners</p>
+    </div>
+    <div class="partners-track-wrap">
+      <div class="partners-track">
+
+        <!-- ── set 1 ── -->
+        <div class="partner-item">
+          <svg width="34" height="26" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.6" y="0.6" width="32.8" height="24.8" rx="2" stroke="currentColor" stroke-width="1.2" opacity="0.55"/>
+            <text x="17" y="18" font-family="'Space Grotesk',sans-serif" font-weight="800" font-size="12" fill="currentColor" text-anchor="middle" letter-spacing="1">TIF</text>
+          </svg>
+          <div class="partner-detail">
+            <div class="partner-name-main">Thessaloniki Int'l Fair</div>
+            <div class="partner-name-sub">Helexpo S.A.</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <div class="partner-item">
+          <div class="partner-detail">
+            <div class="partner-name-main">Exposystem</div>
+            <div class="partner-name-sub">Exhibition Services S.A.</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <div class="partner-item">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="11,1 13.5,7.5 20.5,7.5 14.8,11.8 17,18.5 11,14.5 5,18.5 7.2,11.8 1.5,7.5 8.5,7.5" fill="currentColor"/>
+          </svg>
+          <div class="partner-detail">
+            <div class="partner-name-main">U.S. Embassy</div>
+            <div class="partner-name-sub">Thessaloniki</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <div class="partner-item">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="11" width="3" height="9" fill="currentColor"/>
+            <rect x="7" y="7" width="3" height="13" fill="currentColor"/>
+            <rect x="12" y="3" width="3" height="17" fill="currentColor"/>
+            <rect x="17" y="8" width="3" height="12" fill="currentColor"/>
+            <circle cx="3.5" cy="9" r="2" fill="currentColor"/>
+            <circle cx="8.5" cy="5" r="2" fill="currentColor"/>
+            <circle cx="13.5" cy="1.5" r="2" fill="currentColor"/>
+            <circle cx="18.5" cy="6" r="2" fill="currentColor"/>
+          </svg>
+          <div class="partner-detail">
+            <div class="partner-name-main">Thessaloniki Concert Hall</div>
+            <div class="partner-name-sub">Megaro Mousikis</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <div class="partner-item">
+          <div class="partner-detail">
+            <div class="partner-name-main">Aris B.C.</div>
+            <div class="partner-name-sub">Basketball Club</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <div class="partner-item">
+          <div class="partner-detail">
+            <div class="partner-name-main">Hazlis &amp; Rivas</div>
+            <div class="partner-name-sub">The Economist Impact Events</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <!-- ── set 2 (duplicate for seamless loop) ── -->
+        <div class="partner-item">
+          <svg width="34" height="26" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.6" y="0.6" width="32.8" height="24.8" rx="2" stroke="currentColor" stroke-width="1.2" opacity="0.55"/>
+            <text x="17" y="18" font-family="'Space Grotesk',sans-serif" font-weight="800" font-size="12" fill="currentColor" text-anchor="middle" letter-spacing="1">TIF</text>
+          </svg>
+          <div class="partner-detail">
+            <div class="partner-name-main">Thessaloniki Int'l Fair</div>
+            <div class="partner-name-sub">Helexpo S.A.</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <div class="partner-item">
+          <div class="partner-detail">
+            <div class="partner-name-main">Exposystem</div>
+            <div class="partner-name-sub">Exhibition Services S.A.</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <div class="partner-item">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="11,1 13.5,7.5 20.5,7.5 14.8,11.8 17,18.5 11,14.5 5,18.5 7.2,11.8 1.5,7.5 8.5,7.5" fill="currentColor"/>
+          </svg>
+          <div class="partner-detail">
+            <div class="partner-name-main">U.S. Embassy</div>
+            <div class="partner-name-sub">Thessaloniki</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <div class="partner-item">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="11" width="3" height="9" fill="currentColor"/>
+            <rect x="7" y="7" width="3" height="13" fill="currentColor"/>
+            <rect x="12" y="3" width="3" height="17" fill="currentColor"/>
+            <rect x="17" y="8" width="3" height="12" fill="currentColor"/>
+            <circle cx="3.5" cy="9" r="2" fill="currentColor"/>
+            <circle cx="8.5" cy="5" r="2" fill="currentColor"/>
+            <circle cx="13.5" cy="1.5" r="2" fill="currentColor"/>
+            <circle cx="18.5" cy="6" r="2" fill="currentColor"/>
+          </svg>
+          <div class="partner-detail">
+            <div class="partner-name-main">Thessaloniki Concert Hall</div>
+            <div class="partner-name-sub">Megaro Mousikis</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <div class="partner-item">
+          <div class="partner-detail">
+            <div class="partner-name-main">Aris B.C.</div>
+            <div class="partner-name-sub">Basketball Club</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+        <div class="partner-item">
+          <div class="partner-detail">
+            <div class="partner-name-main">Hazlis &amp; Rivas</div>
+            <div class="partner-name-sub">The Economist Impact Events</div>
+          </div>
+        </div>
+        <span class="p-sep"></span>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section" id="contact">
+    <div class="wrap cta-inner">
+      <h2 class="cta-headline">Let's cover<br>your next stage.</h2>
+      <p class="cta-sub">Tell me the dates, the venue, and what the run-of-show looks like — in Thessaloniki or further afield. I'll confirm availability within one business day.</p>
+      <div class="cta-actions">
+        <a href="mailto:info@megapress.gr" class="btn btn-primary">info@megapress.gr</a>
+        <a href="#" class="btn btn-ghost">Download capabilities deck</a>
+      </div>
+    </div>
+  </section>
+
+  <footer id="about">
+    <div class="wrap">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="wordmark" id="footerLogo"><span class="kicker">PHOTO AGENCY</span><span class="name"><span class="mega">mega</span><span class="press">press</span></span></div>
+          <p>Conference and exhibition photography for organisers, brands and press teams who need the room captured as it actually happened.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <ul style="pointer-events:none;">
+            <li>Keynote &amp; stage</li>
+            <li>Exhibition floor</li>
+            <li>Press &amp; media kits</li>
+            <li>Multi-day coverage</li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <p class="addr">Agias Sofias 22<br>54622 Thessaloniki, Greece<br>+30 2310 235090</p>
+        </div>
+        <div class="footer-col">
+          <h4>Follow</h4>
+          <a href="https://www.linkedin.com/in/spiros-makridis-91537b178/" target="_blank" rel="noopener" class="linkedin-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            LinkedIn
+          </a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Megapress Photo Agency. All rights reserved.</span>
+        <span>Thessaloniki — working worldwide</span>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /page-home -->
+
+
+<!-- ═══════════════════════════════ ON RECORD PAGE ═══════════════════════════════ -->
+<div id="page-onrecord">
+
+  <div class="page-header">
+    <div class="wrap page-header-inner">
+      <p class="eyebrow">Archive — 2021 to present</p>
+      <div class="page-header-content">
+        <h1>On Record</h1>
+        <div>
+          <p class="page-header-sub">Every assignment documented — conferences, exhibition floors, film festivals and trade fairs across Thessaloniki and beyond.</p>
+          <div class="page-header-meta">
+            <p class="meta-item">Events <span>6</span></p>
+            <p class="meta-item">Venues <span>3</span></p>
+            <p class="meta-item">Click any row to expand</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="filter-bar">
+      <span class="filter-label">Category</span>
+      <button class="filter-btn cat-btn active" data-cat="all">All</button>
+      <button class="filter-btn cat-btn" data-cat="pavilions">Pavilions</button>
+      <button class="filter-btn cat-btn" data-cat="conferences">Conferences</button>
+      <button class="filter-btn cat-btn" data-cat="events">Events</button>
+      <button class="filter-btn cat-btn" data-cat="exhibitions">Exhibitions</button>
+      <button class="filter-btn cat-btn" data-cat="b2b">B2B</button>
+    </div>
+    <div class="filter-bar">
+      <span class="filter-label">Year</span>
+      <button class="filter-btn year-btn active" data-year="all">All</button>
+      <button class="filter-btn year-btn" data-year="2025">2025</button>
+      <button class="filter-btn year-btn" data-year="2026">2026</button>
+    </div>
+
+    <div class="programme" id="eventList">
+
+      <div class="event-row" data-category="exhibitions" data-year="2026">
+        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+          <div class="er-time"><span class="dateline">HELEXPO</span>May 2026</div>
+          <div class="er-main">
+            <div class="er-name">Thessaloniki International Book Fair</div>
+            <div class="er-meta"><span class="tag cat-badge">Exhibition</span><span class="tag">Bulgaria — Guest of Honour</span><span class="tag">Full gallery</span><span class="tag">10 photos</span></div>
+          </div>
+          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+        </div>
+        <div class="photo-panel">
+          <div class="photo-panel-inner">
+            <div class="photo-count-bar">
+              <span class="photo-count-label"><em>10</em> photographs — Book Fair 2026</span>
+              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+            </div>
+            <div class="photo-grid" data-event="0"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-row" data-category="exhibitions" data-year="2026">
+        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+          <div class="er-time"><span class="dateline">HELEXPO</span>Mar 2026</div>
+          <div class="er-main">
+            <div class="er-name">Agrotica — Agricultural Machinery</div>
+            <div class="er-meta"><span class="tag cat-badge">Exhibition</span><span class="tag">Biennial</span><span class="tag">Exhibition floor</span><span class="tag">10 photos</span></div>
+          </div>
+          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+        </div>
+        <div class="photo-panel">
+          <div class="photo-panel-inner">
+            <div class="photo-count-bar">
+              <span class="photo-count-label"><em>10</em> photographs — Agrotica 2026</span>
+              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+            </div>
+            <div class="photo-grid" data-event="1"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-row" data-category="events" data-year="2026">
+        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+          <div class="er-time"><span class="dateline">FILMFESTIVAL.GR</span>Mar 2026</div>
+          <div class="er-main">
+            <div class="er-name">Thessaloniki Documentary Festival</div>
+            <div class="er-meta"><span class="tag cat-badge">Event</span><span class="tag">252 films</span><span class="tag">Multi-venue</span><span class="tag">10 photos</span></div>
+          </div>
+          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+        </div>
+        <div class="photo-panel">
+          <div class="photo-panel-inner">
+            <div class="photo-count-bar">
+              <span class="photo-count-label"><em>10</em> photographs — Documentary Festival 2026</span>
+              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+            </div>
+            <div class="photo-grid" data-event="2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-row" data-category="exhibitions" data-year="2026">
+        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+          <div class="er-time"><span class="dateline">HELEXPO</span>Feb–Mar 2026</div>
+          <div class="er-main">
+            <div class="er-name">Artozyma — Bakery &amp; Confectionery</div>
+            <div class="er-meta"><span class="tag cat-badge">Exhibition</span><span class="tag">220 exhibitors</span><span class="tag">Same-day edit</span><span class="tag">10 photos</span></div>
+          </div>
+          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+        </div>
+        <div class="photo-panel">
+          <div class="photo-panel-inner">
+            <div class="photo-count-bar">
+              <span class="photo-count-label"><em>10</em> photographs — Artozyma 2026</span>
+              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+            </div>
+            <div class="photo-grid" data-event="3"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-row" data-category="events" data-year="2025">
+        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+          <div class="er-time"><span class="dateline">FILMFESTIVAL.GR</span>Oct–Nov 2025</div>
+          <div class="er-main">
+            <div class="er-name">Thessaloniki International Film Festival</div>
+            <div class="er-meta"><span class="tag cat-badge">Event</span><span class="tag">92,000 spectators</span><span class="tag">Red carpet</span><span class="tag">10 photos</span></div>
+          </div>
+          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+        </div>
+        <div class="photo-panel">
+          <div class="photo-panel-inner">
+            <div class="photo-count-bar">
+              <span class="photo-count-label"><em>10</em> photographs — Film Festival 2025</span>
+              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+            </div>
+            <div class="photo-grid" data-event="4"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-row" data-category="pavilions" data-year="2025">
+        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+          <div class="er-time"><span class="dateline">HELEXPO</span>Sep 2025</div>
+          <div class="er-main">
+            <div class="er-name">Thessaloniki International Fair</div>
+            <div class="er-meta"><span class="tag cat-badge">Pavilion</span><span class="tag">228,974 visitors</span><span class="tag">PM opening address</span><span class="tag">10 photos</span></div>
+          </div>
+          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+        </div>
+        <div class="photo-panel">
+          <div class="photo-panel-inner">
+            <div class="photo-count-bar">
+              <span class="photo-count-label"><em>10</em> photographs — International Fair 2025</span>
+              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+            </div>
+            <div class="photo-grid" data-event="5"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /eventList -->
+  </div>
+
+  <footer style="margin-top:80px;">
+    <div class="wrap">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="wordmark go-home" style="cursor:pointer;"><span class="kicker">PHOTO AGENCY</span><span class="name"><span class="mega">mega</span><span class="press">press</span></span></div>
+          <p>Conference and exhibition photography for organisers, brands and press teams who need the room captured as it actually happened.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <ul style="pointer-events:none;">
+            <li>Keynote &amp; stage</li>
+            <li>Exhibition floor</li>
+            <li>Press &amp; media kits</li>
+            <li>Multi-day coverage</li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <p class="addr">Agias Sofias 22<br>54622 Thessaloniki, Greece<br>+30 2310 235090</p>
+        </div>
+        <div class="footer-col">
+          <h4>Follow</h4>
+          <a href="https://www.linkedin.com/in/spiros-makridis-91537b178/" target="_blank" rel="noopener" class="linkedin-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            LinkedIn
+          </a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Megapress Photo Agency. All rights reserved.</span>
+        <span>Thessaloniki — working worldwide</span>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /page-onrecord -->
+
+<script>
+// ── Slow smooth scroll ────────────────────────────────────────
+function slowScrollTo(el, duration) {
+  const headerH = 80;
+  const start   = window.scrollY;
+  const target  = el.getBoundingClientRect().top + window.scrollY - headerH;
+  const dist    = target - start;
+  let t0 = null;
+  function ease(t){ return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+  function step(ts){
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / duration, 1);
+    window.scrollTo(0, start + dist * ease(p));
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ── View router ──────────────────────────────────────────────
+const pageHome      = document.getElementById('page-home');
+const pageOnRecord  = document.getElementById('page-onrecord');
+const header        = document.getElementById('siteHeader');
+const navOnRecord   = document.getElementById('navOnRecord');
+const navHome       = document.getElementById('navHome');
+
+function showHome() {
+  pageHome.classList.add('active');
+  pageOnRecord.classList.remove('active');
+  header.classList.remove('on-record-active');
+  navOnRecord.classList.remove('active');
+  window.scrollTo(0,0);
+}
+
+function showOnRecord() {
+  pageOnRecord.classList.add('active');
+  pageHome.classList.remove('active');
+  header.classList.add('on-record-active');
+  navOnRecord.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goHome(hash) {
+  history.pushState(null, '', hash || '#');
+  showHome();
+  if (hash && hash !== '#') {
+    requestAnimationFrame(() => {
+      const el = document.querySelector(hash);
+      if (el) slowScrollTo(el, 240);
+    });
+  }
+}
+
+function routeHash() {
+  if (window.location.hash === '#on-record') {
+    showOnRecord();
+  } else {
+    showHome();
+    if (window.location.hash && window.location.hash !== '#') {
+      requestAnimationFrame(() => {
+        const el = document.querySelector(window.location.hash);
+        if (el) slowScrollTo(el, 240);
+      });
+    }
+  }
+}
+
+window.addEventListener('hashchange', routeHash);
+routeHash();
+
+// Logo → home
+document.getElementById('logoLink').addEventListener('click', e => { e.preventDefault(); goHome('#'); });
+document.getElementById('footerLogo')?.addEventListener('click', e => { e.preventDefault(); goHome('#'); });
+
+// Work nav → On Record view
+navOnRecord.addEventListener('click', e => {
+  e.preventDefault();
+  history.pushState(null,'','#on-record');
+  showOnRecord();
+});
+
+// Coming Up nav
+document.getElementById('navUpcoming').addEventListener('click', e => {
+  e.preventDefault();
+  goHome('#upcoming');
+});
+
+// Why us? nav
+document.getElementById('navApproach').addEventListener('click', e => {
+  e.preventDefault();
+  goHome('#why-us');
+});
+
+// Partners nav
+document.getElementById('navPartners').addEventListener('click', e => {
+  e.preventDefault();
+  goHome('#partners');
+});
+
+// Contact nav
+document.getElementById('navContact').addEventListener('click', e => {
+  e.preventDefault();
+  goHome('#contact');
+});
+
+// hero buttons
+document.getElementById('heroWorkBtn').addEventListener('click', e => {
+  e.preventDefault();
+  history.pushState(null,'','#on-record');
+  showOnRecord();
+});
+document.getElementById('heroContactBtn').addEventListener('click', e => {
+  e.preventDefault();
+  goHome('#contact');
+});
+
+
+// go-home / go-onrecord class links
+document.querySelectorAll('.go-home').forEach(el => {
+  el.addEventListener('click', e => {
+    e.preventDefault();
+    const hash = el.getAttribute('href') || '#';
+    history.pushState(null,'',hash);
+    showHome();
+    const target = hash !== '#' && hash !== '' ? document.querySelector(hash) : null;
+    if (target) setTimeout(() => target.scrollIntoView({behavior:'smooth'}), 50);
+  });
+});
+document.querySelectorAll('.go-onrecord').forEach(el => {
+  el.addEventListener('click', e => {
+    e.preventDefault();
+    history.pushState(null,'','#on-record');
+    showOnRecord();
+  });
+});
+
+// ── Header scroll (home only) ──────────────────────────────
+window.addEventListener('scroll', () => {
+  if (pageHome.classList.contains('active')) {
+    header.classList.toggle('scrolled', window.scrollY > 40);
+  }
+}, { passive:true });
+
+// ── Dust particles ─────────────────────────────────────────
+const dustField = document.getElementById('dustField');
+const count = window.innerWidth < 760 ? 14 : 28;
+for(let i=0;i<count;i++){
+  const d = document.createElement('div');
+  d.className = 'dust';
+  const size = Math.random()*2.4+1;
+  d.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;bottom:-10px;animation-duration:${Math.random()*10+10}s;animation-delay:${Math.random()*10}s`;
+  dustField.appendChild(d);
+}
+
+// ── Photo grids ────────────────────────────────────────────
+const eventSeeds = [
+  [10,20,30,40,50,60,70,80,90,100],
+  [110,120,130,140,150,160,170,180,190,200],
+  [210,220,230,240,250,260,270,280,290,300],
+  [310,320,330,340,350,360,370,380,390,400],
+  [410,420,430,440,450,460,470,480,490,500],
+  [510,520,530,540,550,560,570,580,590,600],
+];
+
+document.querySelectorAll('.photo-grid').forEach(grid => {
+  const ei = parseInt(grid.dataset.event);
+  eventSeeds[ei].forEach((seed, i) => {
+    const card = document.createElement('div');
+    card.className = 'photo-card loading';
+    card.dataset.src = `https://picsum.photos/seed/${seed}/600/400`;
+
+    const img = document.createElement('img');
+    img.alt = `Photo ${i+1}`;
+    img.loading = 'lazy';
+    img.addEventListener('load',  () => card.classList.remove('loading'));
+    img.addEventListener('error', () => card.classList.remove('loading'));
+
+    const ov = document.createElement('div');
+    ov.className = 'photo-overlay';
+    const num = document.createElement('span');
+    num.className = 'photo-num';
+    num.textContent = `${String(i+1).padStart(2,'0')} / 10`;
+    ov.appendChild(num);
+
+    card.appendChild(img);
+    card.appendChild(ov);
+    grid.appendChild(card);
+    card.addEventListener('click', () => openLightbox(ei, i));
+  });
+});
+
+// ── Expand / collapse ──────────────────────────────────────
+function openRow(row) {
+  row.classList.add('is-open');
+  row.querySelector('.event-trigger').setAttribute('aria-expanded','true');
+  row.querySelectorAll('.photo-card').forEach(card => {
+    const img = card.querySelector('img');
+    if (!img.src) img.src = card.dataset.src;
+  });
+}
+function closeRow(row) {
+  row.classList.remove('is-open');
+  row.querySelector('.event-trigger').setAttribute('aria-expanded','false');
+}
+
+document.querySelectorAll('.event-trigger').forEach(trigger => {
+  const activate = () => {
+    const row = trigger.closest('.event-row');
+    if (row.classList.contains('is-open')) {
+      closeRow(row);
+    } else {
+      document.querySelectorAll('.event-row.is-open').forEach(r => closeRow(r));
+      openRow(row);
+    }
+  };
+  trigger.addEventListener('click', activate);
+  trigger.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activate(); } });
+});
+
+document.querySelectorAll('.collapse-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const row = btn.closest('.event-row');
+    closeRow(row);
+  });
+});
+
+// ── Filter (category + year, combined) ────────────────────
+let activeCat = 'all', activeYear = 'all';
+
+function applyFilters() {
+  document.querySelectorAll('.event-row').forEach(row => {
+    const catOk  = activeCat  === 'all' || row.dataset.category === activeCat;
+    const yearOk = activeYear === 'all' || row.dataset.year      === activeYear;
+    const show   = catOk && yearOk;
+    row.style.display = show ? '' : 'none';
+    if (!show) closeRow(row);
+  });
+}
+
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    applyFilters();
+  });
+});
+
+document.querySelectorAll('.year-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeYear = btn.dataset.year;
+    applyFilters();
+  });
+});
+
+// ── Lightbox ───────────────────────────────────────────────
+let lbEvent=0, lbIdx=0;
+const lightbox  = document.getElementById('lightbox');
+const lbImg     = document.getElementById('lbImg');
+const lbCounter = document.getElementById('lbCounter');
+
+function showLbPhoto() {
+  lbImg.src = `https://picsum.photos/seed/${eventSeeds[lbEvent][lbIdx]}/1200/800`;
+  lbCounter.textContent = `${lbIdx+1} / 10`;
+}
+function openLightbox(ei, idx) {
+  lbEvent=ei; lbIdx=idx;
+  showLbPhoto();
+  lightbox.classList.add('active');
+  document.body.style.overflow='hidden';
+}
+
+document.getElementById('lbClose').addEventListener('click', () => { lightbox.classList.remove('active'); document.body.style.overflow=''; });
+document.getElementById('lbPrev').addEventListener('click',  () => { lbIdx=(lbIdx-1+10)%10; showLbPhoto(); });
+document.getElementById('lbNext').addEventListener('click',  () => { lbIdx=(lbIdx+1)%10; showLbPhoto(); });
+lightbox.addEventListener('click', e => { if(e.target===lightbox){ lightbox.classList.remove('active'); document.body.style.overflow=''; }});
+document.addEventListener('keydown', e => {
+  if (!lightbox.classList.contains('active')) return;
+  if (e.key==='Escape')      { lightbox.classList.remove('active'); document.body.style.overflow=''; }
+  if (e.key==='ArrowLeft')   { lbIdx=(lbIdx-1+10)%10; showLbPhoto(); }
+  if (e.key==='ArrowRight')  { lbIdx=(lbIdx+1)%10; showLbPhoto(); }
+});
+</script>
+
+</body>
+</html>
