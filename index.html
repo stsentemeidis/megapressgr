@@ -55,6 +55,8 @@
   }
   header.scrolled{ background:rgba(11,11,12,0.88); backdrop-filter: blur(10px); padding:16px 40px; border-bottom: 1px solid var(--line); }
   header.on-record-active{ background:rgba(11,11,12,0.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .nav-home{ opacity:0; pointer-events:none; transition:opacity .2s ease; }
+  header.on-record-active .nav-home{ opacity:1; pointer-events:all; }
 
   nav ul{ list-style:none; display:flex; gap:36px; }
   nav a{
@@ -223,6 +225,9 @@
   .partner-name-sub{ font-family:var(--mono); font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--paper-dim); line-height:1.5; white-space:nowrap; margin-top:3px; }
   .p-sep{ display:inline-block; width:1px; height:36px; background:var(--line-strong); flex-shrink:0; }
   /* linkedin */
+  .footer-email{ display:block; color:var(--paper-dim); font-size:13px; text-decoration:none; transition:color .2s ease; word-break:break-all; }
+  .footer-email:hover{ color:var(--paper); }
+  .footer-phone{ display:block; color:var(--steel); font-size:12px; font-family:var(--mono); letter-spacing:0.04em; margin-top:8px; }
   .linkedin-btn{ display:inline-flex; align-items:center; gap:7px; color:var(--steel); font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-decoration:none; transition:color .2s ease; }
   .linkedin-btn:hover{ color:var(--paper); }
   .cta-section{ border-top:1px solid var(--line); position:relative; overflow:hidden; }
@@ -236,7 +241,7 @@
 
   /* ===================== FOOTER ===================== */
   footer{ border-top:1px solid var(--line); padding:64px 0 36px; }
-  .footer-top{ display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; gap:40px; padding-bottom:56px; align-items:start; }
+  .footer-top{ display:grid; grid-template-columns:1.6fr 1fr 1.4fr 1fr; gap:40px; padding-bottom:56px; align-items:start; }
   .footer-brand p{ color:var(--paper-dim); font-size:13px; line-height:1.65; max-width:200px; margin-top:18px; }
   .footer-col h4{ font-family:var(--mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--steel); margin-bottom:18px; }
   .footer-col ul{ list-style:none; display:flex; flex-direction:column; gap:11px; }
@@ -331,6 +336,22 @@
   .lightbox-next{ right:32px; }
   .lightbox-counter{ position:absolute; bottom:28px; font-family:var(--mono); font-size:11px; letter-spacing:0.1em; color:var(--steel); }
 
+  /* ── On Record section tabs ───────────────────────────── */
+  .or-section-nav{ display:flex; border-bottom:1px solid var(--line); margin-bottom:0; padding-top:8px; }
+  .or-snav{ font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; padding:14px 24px; background:none; border:none; border-bottom:2px solid transparent; color:var(--steel); cursor:pointer; transition:all .2s ease; margin-bottom:-1px; }
+  .or-snav:hover{ color:var(--paper-dim); }
+  .or-snav.active{ color:var(--paper); border-bottom-color:var(--orange); }
+  .or-panel{ display:none; padding-top:32px; }
+  .or-panel.active{ display:block; }
+  .filter-sep{ display:inline-block; width:1px; height:20px; background:var(--line-strong); flex-shrink:0; margin:0 6px; align-self:center; }
+  /* pavilion toggle */
+  .pav-toggle-bar{ display:flex; border:1px solid var(--line); border-radius:3px; overflow:hidden; width:fit-content; margin-bottom:28px; }
+  .pav-toggle{ font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; padding:9px 24px; background:none; border:none; color:var(--steel); cursor:pointer; transition:all .18s ease; }
+  .pav-toggle.active{ background:rgba(255,90,31,0.1); color:var(--orange); }
+  .pav-set{ display:none; }
+  .pav-set.active{ display:block; }
+  .pav-grid{ grid-template-columns:repeat(5,1fr); }
+
   /* ===================== RESPONSIVE ===================== */
   @media(max-width:880px){
     nav, .nav-cta{ display:none; }
@@ -366,6 +387,7 @@
   </div>
   <nav>
     <ul>
+      <li class="nav-home"><a href="#" id="navHome">← Home</a></li>
       <li><a href="#upcoming" id="navUpcoming">Coming Up</a></li>
       <li><a href="#why-us" id="navApproach">Why us?</a></li>
       <li><a href="#partners" id="navPartners">Partners</a></li>
@@ -668,10 +690,6 @@
         </div>
         <span class="p-sep"></span>
         <div class="partner-item">
-          <div class="partner-detail"><div class="partner-name-main">Thessaloniki Film Festival</div><div class="partner-name-sub">International Cinema</div></div>
-        </div>
-        <span class="p-sep"></span>
-        <div class="partner-item">
           <div class="partner-detail"><div class="partner-name-main">Documentary Festival</div><div class="partner-name-sub">Short Film &amp; Doc</div></div>
         </div>
         <span class="p-sep"></span>
@@ -695,10 +713,6 @@
         <span class="p-sep"></span>
         <div class="partner-item">
           <div class="partner-detail"><div class="partner-name-main">Philoxenia — Hotelia</div><div class="partner-name-sub">Hospitality &amp; Tourism</div></div>
-        </div>
-        <span class="p-sep"></span>
-        <div class="partner-item">
-          <div class="partner-detail"><div class="partner-name-main">Thessaloniki Film Festival</div><div class="partner-name-sub">International Cinema</div></div>
         </div>
         <span class="p-sep"></span>
         <div class="partner-item">
@@ -766,7 +780,7 @@
   <div class="stats">
     <div class="wrap">
       <div class="stats-grid">
-        <div class="stat"><div class="stat-num">15<span class="unit">yrs</span></div><div class="stat-label">Behind the lens</div></div>
+        <div class="stat"><div class="stat-num">40<span class="unit">yrs</span></div><div class="stat-label">Behind the lens</div></div>
         <div class="stat"><div class="stat-num">500<span class="unit">+</span></div><div class="stat-label">Events covered</div></div>
         <div class="stat"><div class="stat-num">24<span class="unit">hr</span></div><div class="stat-label">Standard turnaround</div></div>
         <div class="stat"><div class="stat-num is-word">Global</div><div class="stat-label">Availability</div></div>
@@ -922,7 +936,7 @@
       <h2 class="cta-headline">Let's cover<br>your next stage.</h2>
       <p class="cta-sub">Tell me the dates, the venue, and what the run-of-show looks like — in Thessaloniki or further afield. I'll confirm availability within one business day.</p>
       <div class="cta-actions">
-        <a href="mailto:info@megapress.gr" class="btn btn-primary">info@megapress.gr</a>
+        <a href="mailto:megapressagency01@gmail.com" class="btn btn-primary">megapressagency01@gmail.com</a>
         <a href="#" class="btn btn-ghost">Download capabilities deck</a>
       </div>
     </div>
@@ -946,7 +960,8 @@
         </div>
         <div class="footer-col">
           <h4>Contact</h4>
-          <p class="addr">Agias Sofias 22<br>54622 Thessaloniki, Greece<br>+30 2310 235090</p>
+          <a href="mailto:megapressagency01@gmail.com" class="footer-email">megapressagency01@gmail.com</a>
+          <span class="footer-phone">+30 2310 235090</span>
         </div>
         <div class="footer-col">
           <h4>Follow</h4>
@@ -977,10 +992,9 @@
       <div class="page-header-content">
         <h1>On Record</h1>
         <div>
-          <p class="page-header-sub">Every assignment documented — conferences, exhibition floors, film festivals and trade fairs across Thessaloniki and beyond.</p>
+          <p class="page-header-sub">Every assignment documented — conferences, exhibition floors, B2B sessions and pavilion work across Thessaloniki and beyond.</p>
           <div class="page-header-meta">
-            <p class="meta-item">Events <span>6</span></p>
-            <p class="meta-item">Venues <span>3</span></p>
+            <p class="meta-item">Events &amp; Exhibitions <span>10</span></p>
             <p class="meta-item">Click any row to expand</p>
           </div>
         </div>
@@ -988,147 +1002,269 @@
     </div>
   </div>
 
+  <!-- Section nav -->
   <div class="wrap">
-    <div class="filter-bar">
-      <span class="filter-label">Category</span>
-      <button class="filter-btn cat-btn active" data-cat="all">All</button>
-      <button class="filter-btn cat-btn" data-cat="pavilions">Pavilions</button>
-      <button class="filter-btn cat-btn" data-cat="conferences">Conferences</button>
-      <button class="filter-btn cat-btn" data-cat="events">Events</button>
-      <button class="filter-btn cat-btn" data-cat="exhibitions">Exhibitions</button>
-      <button class="filter-btn cat-btn" data-cat="b2b">B2B</button>
+    <div class="or-section-nav">
+      <button class="or-snav active" data-panel="ee">Events &amp; Exhibitions</button>
+      <button class="or-snav" data-panel="pav">Pavilions</button>
+      <button class="or-snav" data-panel="b2b">B2B</button>
     </div>
-    <div class="filter-bar">
-      <span class="filter-label">Year</span>
-      <button class="filter-btn year-btn active" data-year="all">All</button>
-      <button class="filter-btn year-btn" data-year="2025">2025</button>
-      <button class="filter-btn year-btn" data-year="2026">2026</button>
-    </div>
-
-    <div class="programme" id="eventList">
-
-      <div class="event-row" data-category="exhibitions" data-year="2026">
-        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
-          <div class="er-time"><span class="dateline">HELEXPO</span>May 2026</div>
-          <div class="er-main">
-            <div class="er-name">Thessaloniki International Book Fair</div>
-            <div class="er-meta"><span class="tag cat-badge">Exhibition</span><span class="tag">Bulgaria — Guest of Honour</span><span class="tag">Full gallery</span><span class="tag">10 photos</span></div>
-          </div>
-          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
-        </div>
-        <div class="photo-panel">
-          <div class="photo-panel-inner">
-            <div class="photo-count-bar">
-              <span class="photo-count-label"><em>10</em> photographs — Book Fair 2026</span>
-              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
-            </div>
-            <div class="photo-grid" data-event="0"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="event-row" data-category="exhibitions" data-year="2026">
-        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
-          <div class="er-time"><span class="dateline">HELEXPO</span>Mar 2026</div>
-          <div class="er-main">
-            <div class="er-name">Agrotica — Agricultural Machinery</div>
-            <div class="er-meta"><span class="tag cat-badge">Exhibition</span><span class="tag">Biennial</span><span class="tag">Exhibition floor</span><span class="tag">10 photos</span></div>
-          </div>
-          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
-        </div>
-        <div class="photo-panel">
-          <div class="photo-panel-inner">
-            <div class="photo-count-bar">
-              <span class="photo-count-label"><em>10</em> photographs — Agrotica 2026</span>
-              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
-            </div>
-            <div class="photo-grid" data-event="1"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="event-row" data-category="events" data-year="2026">
-        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
-          <div class="er-time"><span class="dateline">FILMFESTIVAL.GR</span>Mar 2026</div>
-          <div class="er-main">
-            <div class="er-name">Thessaloniki Documentary Festival</div>
-            <div class="er-meta"><span class="tag cat-badge">Event</span><span class="tag">252 films</span><span class="tag">Multi-venue</span><span class="tag">10 photos</span></div>
-          </div>
-          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
-        </div>
-        <div class="photo-panel">
-          <div class="photo-panel-inner">
-            <div class="photo-count-bar">
-              <span class="photo-count-label"><em>10</em> photographs — Documentary Festival 2026</span>
-              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
-            </div>
-            <div class="photo-grid" data-event="2"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="event-row" data-category="exhibitions" data-year="2026">
-        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
-          <div class="er-time"><span class="dateline">HELEXPO</span>Feb–Mar 2026</div>
-          <div class="er-main">
-            <div class="er-name">Artozyma — Bakery &amp; Confectionery</div>
-            <div class="er-meta"><span class="tag cat-badge">Exhibition</span><span class="tag">220 exhibitors</span><span class="tag">Same-day edit</span><span class="tag">10 photos</span></div>
-          </div>
-          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
-        </div>
-        <div class="photo-panel">
-          <div class="photo-panel-inner">
-            <div class="photo-count-bar">
-              <span class="photo-count-label"><em>10</em> photographs — Artozyma 2026</span>
-              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
-            </div>
-            <div class="photo-grid" data-event="3"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="event-row" data-category="events" data-year="2025">
-        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
-          <div class="er-time"><span class="dateline">FILMFESTIVAL.GR</span>Oct–Nov 2025</div>
-          <div class="er-main">
-            <div class="er-name">Thessaloniki International Film Festival</div>
-            <div class="er-meta"><span class="tag cat-badge">Event</span><span class="tag">92,000 spectators</span><span class="tag">Red carpet</span><span class="tag">10 photos</span></div>
-          </div>
-          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
-        </div>
-        <div class="photo-panel">
-          <div class="photo-panel-inner">
-            <div class="photo-count-bar">
-              <span class="photo-count-label"><em>10</em> photographs — Film Festival 2025</span>
-              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
-            </div>
-            <div class="photo-grid" data-event="4"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="event-row" data-category="pavilions" data-year="2025">
-        <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
-          <div class="er-time"><span class="dateline">HELEXPO</span>Sep 2025</div>
-          <div class="er-main">
-            <div class="er-name">Thessaloniki International Fair</div>
-            <div class="er-meta"><span class="tag cat-badge">Pavilion</span><span class="tag">228,974 visitors</span><span class="tag">PM opening address</span><span class="tag">10 photos</span></div>
-          </div>
-          <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
-        </div>
-        <div class="photo-panel">
-          <div class="photo-panel-inner">
-            <div class="photo-count-bar">
-              <span class="photo-count-label"><em>10</em> photographs — International Fair 2025</span>
-              <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
-            </div>
-            <div class="photo-grid" data-event="5"></div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /eventList -->
   </div>
+
+  <!-- ── Panel: Events & Exhibitions ── -->
+  <div class="or-panel active" id="or-panel-ee">
+    <div class="wrap">
+      <div class="filter-bar">
+        <span class="filter-label">Category</span>
+        <button class="filter-btn ee-cat active" data-cat="all">All</button>
+        <button class="filter-btn ee-cat" data-cat="event">Event</button>
+        <button class="filter-btn ee-cat" data-cat="exhibition">Exhibition</button>
+        <span class="filter-sep"></span>
+        <span class="filter-label">Year</span>
+        <button class="filter-btn ee-year active" data-year="all">All</button>
+        <button class="filter-btn ee-year" data-year="2026">2026</button>
+        <button class="filter-btn ee-year" data-year="2025">2025</button>
+      </div>
+
+      <div class="programme" id="eeList">
+
+        <!-- EVENTS -->
+        <div class="event-row" data-category="event" data-year="2026">
+          <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+            <div class="er-time"><span class="dateline">EVENT · 2026</span>Blue Heritage</div>
+            <div class="er-main">
+              <div class="er-name">Blue Heritage Summit Thessaloniki</div>
+              <div class="er-meta"><span class="tag cat-badge">Event</span><span class="tag">10 photos</span></div>
+            </div>
+            <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+          </div>
+          <div class="photo-panel">
+            <div class="photo-panel-inner">
+              <div class="photo-count-bar">
+                <span class="photo-count-label"><em>10</em> photographs — Blue Heritage Summit 2026</span>
+                <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+              </div>
+              <div class="photo-grid" data-folder="Events/Blue Heritage Summit Thessaloniki 2026" data-photos="MAKP0576.JPG,MAKP0793.JPG,MAKP0876.JPG,MAKP1147.JPG,SPYR1193.JPG,SPYR1239.JPG,SPYR1263.JPG,SPYR1538.JPG,SPYR1539.JPG,SPYR1579.JPG"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-row" data-category="event" data-year="2026">
+          <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+            <div class="er-time"><span class="dateline">EVENT · 2026</span>Economist</div>
+            <div class="er-main">
+              <div class="er-name">The Sixth Economist Thessaloniki Metropolitan Summit</div>
+              <div class="er-meta"><span class="tag cat-badge">Event</span><span class="tag">Conference</span></div>
+            </div>
+            <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+          </div>
+          <div class="photo-panel">
+            <div class="photo-panel-inner">
+              <div class="photo-count-bar">
+                <span class="photo-count-label">Sixth Economist Thessaloniki Metropolitan Summit 2026</span>
+                <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+              </div>
+              <div class="photo-grid" data-seeds="601,611,621,631,641,651,661,671,681,691"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-row" data-category="event" data-year="2025">
+          <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+            <div class="er-time"><span class="dateline">EVENT · 2025</span>Economist</div>
+            <div class="er-main">
+              <div class="er-name">The Fifth Economist Thessaloniki Metropolitan Summit</div>
+              <div class="er-meta"><span class="tag cat-badge">Event</span><span class="tag">10 photos</span></div>
+            </div>
+            <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+          </div>
+          <div class="photo-panel">
+            <div class="photo-panel-inner">
+              <div class="photo-count-bar">
+                <span class="photo-count-label"><em>10</em> photographs — Fifth Economist Thessaloniki Metropolitan Summit 2025</span>
+                <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+              </div>
+              <div class="photo-grid" data-folder="Events/The 5th Economist Thessaloniki Metropolitan Summit 2025" data-photos="SPYR1398.JPG,SPYR1459.JPG,SPYR1494.JPG,SPYR1951.JPG,SPYR2258.JPG,SPYR2376.JPG,SPYR2683.JPG,SPYR2734.JPG,SPYR2770.JPG,SPYR3114.JPG"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-row" data-category="event" data-year="2025">
+          <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+            <div class="er-time"><span class="dateline">EVENT · 2025</span>HYDRO</div>
+            <div class="er-main">
+              <div class="er-name">HYDRO 2025</div>
+              <div class="er-meta"><span class="tag cat-badge">Event</span><span class="tag">10 photos</span></div>
+            </div>
+            <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+          </div>
+          <div class="photo-panel">
+            <div class="photo-panel-inner">
+              <div class="photo-count-bar">
+                <span class="photo-count-label"><em>10</em> photographs — HYDRO 2025</span>
+                <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+              </div>
+              <div class="photo-grid" data-folder="Events/Hydro 2025" data-photos="SPYR0239.JPG,SPYR3281.JPG,SPYR3384.JPG,SPYR3423.JPG,SPYR3622.JPG,SPYR3627.JPG,SPYR3657.JPG,SPYR3813.JPG,SPYR3908.JPG,SPYR4654.JPG"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-row" data-category="event" data-year="2025">
+          <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+            <div class="er-time"><span class="dateline">EVENT · 2025</span>Μέγαρο</div>
+            <div class="er-main">
+              <div class="er-name">Μέγαρο Μουσικής — Συναυλία ΜΟΥΣΑ, Ταξιδεύοντας στην Αυστρία</div>
+              <div class="er-meta"><span class="tag cat-badge">Event</span><span class="tag">10 photos</span></div>
+            </div>
+            <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+          </div>
+          <div class="photo-panel">
+            <div class="photo-panel-inner">
+              <div class="photo-count-bar">
+                <span class="photo-count-label"><em>10</em> photographs — Μέγαρο Μουσικής ΜΟΥΣΑ 2025</span>
+                <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+              </div>
+              <div class="photo-grid" data-folder="Events/Thessaloniki Concert Hall - Mousa Concert 2025" data-photos="SPYR1138.JPG,SPYR1301.JPG,SPYR1312.JPG,SPYR1316.JPG,SPYR1323.JPG,SPYR1440.JPG,SPYR1470.JPG,SPYR1532.JPG,SPYR1547.JPG,SPYR5759.JPG"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXHIBITIONS -->
+        <div class="event-row" data-category="exhibition" data-year="2026">
+          <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+            <div class="er-time"><span class="dateline">EXHIB · 2026</span>ΔΕΘ</div>
+            <div class="er-main">
+              <div class="er-name">Thessaloniki International Fair — 90th Edition</div>
+              <div class="er-meta"><span class="tag cat-badge">Exhibition</span><span class="tag">Japan — Honoured Country</span></div>
+            </div>
+            <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+          </div>
+          <div class="photo-panel">
+            <div class="photo-panel-inner">
+              <div class="photo-count-bar">
+                <span class="photo-count-label">ΔΕΘ 2026 — coming soon</span>
+                <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+              </div>
+              <div class="photo-grid" data-seeds="701,711,721,731,741,751,761,771,781,791"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-row" data-category="exhibition" data-year="2026">
+          <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+            <div class="er-time"><span class="dateline">EXHIB · 2026</span>Agrotica</div>
+            <div class="er-main">
+              <div class="er-name">Agrotica — Agricultural Machinery &amp; Equipment</div>
+              <div class="er-meta"><span class="tag cat-badge">Exhibition</span><span class="tag">10 photos</span></div>
+            </div>
+            <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+          </div>
+          <div class="photo-panel">
+            <div class="photo-panel-inner">
+              <div class="photo-count-bar">
+                <span class="photo-count-label"><em>10</em> photographs — Agrotica 2026</span>
+                <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+              </div>
+              <div class="photo-grid" data-folder="Exhibitions/Agrotica 2026" data-photos="SPYR0049.JPG,SPYR0092.JPG,SPYR0287.JPG,SPYR0388.JPG,SPYR0836.JPG,SPYR0949.JPG,SPYR9872.JPG,SPYR9907.JPG,SPYR9931.JPG,SPYR9997.JPG"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-row" data-category="exhibition" data-year="2026">
+          <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+            <div class="er-time"><span class="dateline">EXHIB · 2026</span>Artozyma</div>
+            <div class="er-main">
+              <div class="er-name">Artozyma — Bakery &amp; Confectionery</div>
+              <div class="er-meta"><span class="tag cat-badge">Exhibition</span><span class="tag">10 photos</span></div>
+            </div>
+            <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+          </div>
+          <div class="photo-panel">
+            <div class="photo-panel-inner">
+              <div class="photo-count-bar">
+                <span class="photo-count-label"><em>10</em> photographs — Artozyma 2026</span>
+                <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+              </div>
+              <div class="photo-grid" data-folder="Exhibitions/ARTOZYMA 2026" data-photos="SPYR3069.JPG,SPYR3172.JPG,SPYR3313.JPG,SPYR3389.JPG,SPYR4214.JPG,SPYR4222.JPG,SPYR4251.JPG,SPYR4311.JPG,SPYR4329.JPG,SPYR4585.JPG"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-row" data-category="exhibition" data-year="2025">
+          <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+            <div class="er-time"><span class="dateline">EXHIB · 2025</span>ΔΕΘ</div>
+            <div class="er-main">
+              <div class="er-name">Thessaloniki International Fair 2025</div>
+              <div class="er-meta"><span class="tag cat-badge">Exhibition</span></div>
+            </div>
+            <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+          </div>
+          <div class="photo-panel">
+            <div class="photo-panel-inner">
+              <div class="photo-count-bar">
+                <span class="photo-count-label">ΔΕΘ 2025</span>
+                <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+              </div>
+              <div class="photo-grid" data-folder="Exhibitions/TIF 2025" data-photos=""></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-row" data-category="exhibition" data-year="2025">
+          <div class="event-trigger" tabindex="0" role="button" aria-expanded="false">
+            <div class="er-time"><span class="dateline">EXHIB · 2025</span>Philoxenia</div>
+            <div class="er-main">
+              <div class="er-name">Philoxenia — Hotelia 2025</div>
+              <div class="er-meta"><span class="tag cat-badge">Exhibition</span><span class="tag">10 photos</span></div>
+            </div>
+            <div class="expand-toggle"><span class="expand-hint">View photos</span><span class="expand-icon"></span></div>
+          </div>
+          <div class="photo-panel">
+            <div class="photo-panel-inner">
+              <div class="photo-count-bar">
+                <span class="photo-count-label"><em>10</em> photographs — Philoxenia-Hotelia 2025</span>
+                <button class="collapse-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><line x1="10" y1="10" x2="2" y2="2"/></svg>Collapse</button>
+              </div>
+              <div class="photo-grid" data-folder="Exhibitions/Philoxenia-Hotelia 2025" data-photos="SPYR4317.JPG,SPYR4320.JPG,SPYR4335.JPG,SPYR4435.JPG,SPYR4450.JPG,SPYR4475.JPG,SPYR4478.JPG,SPYR4490.JPG,SPYR4502.JPG,SPYR4573.JPG"></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /eeList -->
+    </div>
+  </div><!-- /panel ee -->
+
+  <!-- ── Panel: Pavilions ── -->
+  <div class="or-panel" id="or-panel-pav">
+    <div class="wrap">
+      <div class="pav-toggle-bar">
+        <button class="pav-toggle active" data-pav="inside">Internal</button>
+        <button class="pav-toggle" data-pav="outside">External</button>
+      </div>
+      <div class="pav-set active" id="pav-inside">
+        <div class="photo-count-bar" style="margin-bottom:16px;">
+          <span class="photo-count-label"><em>5</em> photographs — Internal</span>
+        </div>
+        <div class="photo-grid pav-grid" data-folder="Pavilions/Inside" data-photos="SPYR0395.JPG,SPYR6682.JPG,SPYR6697.JPG,SPYR6710.JPG,SPYR6735.JPG"></div>
+      </div>
+      <div class="pav-set" id="pav-outside">
+        <div class="photo-count-bar" style="margin-bottom:16px;">
+          <span class="photo-count-label"><em>4</em> photographs — External</span>
+        </div>
+        <div class="photo-grid pav-grid" data-folder="Pavilions/Outside" data-photos="SPYR4075.JPG,SPYR4156.JPG,SPYR4295.JPG,SPYR6600.JPG"></div>
+      </div>
+    </div>
+  </div><!-- /panel pav -->
+
+  <!-- ── Panel: B2B ── -->
+  <div class="or-panel" id="or-panel-b2b">
+    <div class="wrap">
+      <div class="photo-count-bar" style="margin-bottom:20px;">
+        <span class="photo-count-label"><em>10</em> photographs — B2B</span>
+      </div>
+      <div class="photo-grid" data-folder="B2B" data-photos="SPYR2153.JPG,SPYR2195.JPG,SPYR3170.JPG,SPYR3200.JPG,SPYR3207.JPG,SPYR4199.JPG,SPYR4200.JPG,SPYR4889.JPG,SPYR4890.JPG,SPYR5577.JPG"></div>
+    </div>
+  </div><!-- /panel b2b -->
 
   <footer style="margin-top:80px;">
     <div class="wrap">
@@ -1148,7 +1284,8 @@
         </div>
         <div class="footer-col">
           <h4>Contact</h4>
-          <p class="addr">Agias Sofias 22<br>54622 Thessaloniki, Greece<br>+30 2310 235090</p>
+          <a href="mailto:megapressagency01@gmail.com" class="footer-email">megapressagency01@gmail.com</a>
+          <span class="footer-phone">+30 2310 235090</span>
         </div>
         <div class="footer-col">
           <h4>Follow</h4>
@@ -1240,6 +1377,7 @@ routeHash();
 
 // Logo → home
 document.getElementById('logoLink').addEventListener('click', e => { e.preventDefault(); goHome('#'); });
+document.getElementById('navHome').addEventListener('click', e => { e.preventDefault(); goHome('#'); });
 document.getElementById('footerLogo')?.addEventListener('click', e => { e.preventDefault(); goHome('#'); });
 
 // Work nav → On Record view
@@ -1323,21 +1461,12 @@ for(let i=0;i<count;i++){
 }
 
 // ── Photo grids ────────────────────────────────────────────
-const eventSeeds = [
-  [10,20,30,40,50,60,70,80,90,100],
-  [110,120,130,140,150,160,170,180,190,200],
-  [210,220,230,240,250,260,270,280,290,300],
-  [310,320,330,340,350,360,370,380,390,400],
-  [410,420,430,440,450,460,470,480,490,500],
-  [510,520,530,540,550,560,570,580,590,600],
-];
-
-document.querySelectorAll('.photo-grid').forEach(grid => {
-  const ei = parseInt(grid.dataset.event);
-  eventSeeds[ei].forEach((seed, i) => {
+function buildPhotoGrid(grid, photos) {
+  grid._photos = photos;
+  photos.forEach((src, i) => {
     const card = document.createElement('div');
     card.className = 'photo-card loading';
-    card.dataset.src = `https://picsum.photos/seed/${seed}/600/400`;
+    card.dataset.src = src;
 
     const img = document.createElement('img');
     img.alt = `Photo ${i+1}`;
@@ -1349,14 +1478,26 @@ document.querySelectorAll('.photo-grid').forEach(grid => {
     ov.className = 'photo-overlay';
     const num = document.createElement('span');
     num.className = 'photo-num';
-    num.textContent = `${String(i+1).padStart(2,'0')} / 10`;
+    num.textContent = `${String(i+1).padStart(2,'0')} / ${photos.length}`;
     ov.appendChild(num);
 
     card.appendChild(img);
     card.appendChild(ov);
     grid.appendChild(card);
-    card.addEventListener('click', () => openLightbox(ei, i));
+    card.addEventListener('click', () => openLightbox(photos, i));
   });
+}
+
+document.querySelectorAll('.photo-grid').forEach(grid => {
+  let photos = [];
+  if (grid.dataset.folder && grid.dataset.photos !== undefined) {
+    const folder = grid.dataset.folder;
+    const files = grid.dataset.photos.split(',').map(f => f.trim()).filter(Boolean);
+    photos = files.map(f => `${folder}/${f}`);
+  } else if (grid.dataset.seeds) {
+    photos = grid.dataset.seeds.split(',').map(s => `https://picsum.photos/seed/${s.trim()}/600/400`);
+  }
+  buildPhotoGrid(grid, photos);
 });
 
 // ── Expand / collapse ──────────────────────────────────────
@@ -1390,16 +1531,45 @@ document.querySelectorAll('.event-trigger').forEach(trigger => {
 document.querySelectorAll('.collapse-btn').forEach(btn => {
   btn.addEventListener('click', e => {
     e.stopPropagation();
-    const row = btn.closest('.event-row');
-    closeRow(row);
+    closeRow(btn.closest('.event-row'));
   });
 });
 
-// ── Filter (category + year, combined) ────────────────────
+// ── Section nav (Events & Exhibitions / Pavilions / B2B) ──
+document.querySelectorAll('.or-snav').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.or-snav').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.or-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('or-panel-' + btn.dataset.panel).classList.add('active');
+    // lazy-load visible photo-cards in newly shown panel
+    document.getElementById('or-panel-' + btn.dataset.panel).querySelectorAll('.photo-card').forEach(card => {
+      const img = card.querySelector('img');
+      if (!img.src) img.src = card.dataset.src;
+    });
+  });
+});
+
+// ── Pavilion Internal / External toggle ───────────────────
+document.querySelectorAll('.pav-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.pav-toggle').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.pav-set').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    const set = document.getElementById('pav-' + btn.dataset.pav);
+    set.classList.add('active');
+    set.querySelectorAll('.photo-card').forEach(card => {
+      const img = card.querySelector('img');
+      if (!img.src) img.src = card.dataset.src;
+    });
+  });
+});
+
+// ── EE Filters (category + year) ──────────────────────────
 let activeCat = 'all', activeYear = 'all';
 
 function applyFilters() {
-  document.querySelectorAll('.event-row').forEach(row => {
+  document.querySelectorAll('#eeList .event-row').forEach(row => {
     const catOk  = activeCat  === 'all' || row.dataset.category === activeCat;
     const yearOk = activeYear === 'all' || row.dataset.year      === activeYear;
     const show   = catOk && yearOk;
@@ -1408,18 +1578,18 @@ function applyFilters() {
   });
 }
 
-document.querySelectorAll('.cat-btn').forEach(btn => {
+document.querySelectorAll('.ee-cat').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.ee-cat').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     activeCat = btn.dataset.cat;
     applyFilters();
   });
 });
 
-document.querySelectorAll('.year-btn').forEach(btn => {
+document.querySelectorAll('.ee-year').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.ee-year').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     activeYear = btn.dataset.year;
     applyFilters();
@@ -1427,31 +1597,33 @@ document.querySelectorAll('.year-btn').forEach(btn => {
 });
 
 // ── Lightbox ───────────────────────────────────────────────
-let lbEvent=0, lbIdx=0;
+let currentPhotos = [], currentIdx = 0;
 const lightbox  = document.getElementById('lightbox');
 const lbImg     = document.getElementById('lbImg');
 const lbCounter = document.getElementById('lbCounter');
 
 function showLbPhoto() {
-  lbImg.src = `https://picsum.photos/seed/${eventSeeds[lbEvent][lbIdx]}/1200/800`;
-  lbCounter.textContent = `${lbIdx+1} / 10`;
+  const src = currentPhotos[currentIdx];
+  lbImg.src = src.includes('picsum') ? src.replace('/600/400','/1200/800') : src;
+  lbCounter.textContent = `${currentIdx+1} / ${currentPhotos.length}`;
 }
-function openLightbox(ei, idx) {
-  lbEvent=ei; lbIdx=idx;
+function openLightbox(photos, idx) {
+  currentPhotos = photos; currentIdx = idx;
   showLbPhoto();
   lightbox.classList.add('active');
-  document.body.style.overflow='hidden';
+  document.body.style.overflow = 'hidden';
 }
+function closeLightbox() { lightbox.classList.remove('active'); document.body.style.overflow = ''; }
 
-document.getElementById('lbClose').addEventListener('click', () => { lightbox.classList.remove('active'); document.body.style.overflow=''; });
-document.getElementById('lbPrev').addEventListener('click',  () => { lbIdx=(lbIdx-1+10)%10; showLbPhoto(); });
-document.getElementById('lbNext').addEventListener('click',  () => { lbIdx=(lbIdx+1)%10; showLbPhoto(); });
-lightbox.addEventListener('click', e => { if(e.target===lightbox){ lightbox.classList.remove('active'); document.body.style.overflow=''; }});
+document.getElementById('lbClose').addEventListener('click', closeLightbox);
+document.getElementById('lbPrev').addEventListener('click', () => { currentIdx = (currentIdx - 1 + currentPhotos.length) % currentPhotos.length; showLbPhoto(); });
+document.getElementById('lbNext').addEventListener('click', () => { currentIdx = (currentIdx + 1) % currentPhotos.length; showLbPhoto(); });
+lightbox.addEventListener('click', e => { if(e.target === lightbox) closeLightbox(); });
 document.addEventListener('keydown', e => {
   if (!lightbox.classList.contains('active')) return;
-  if (e.key==='Escape')      { lightbox.classList.remove('active'); document.body.style.overflow=''; }
-  if (e.key==='ArrowLeft')   { lbIdx=(lbIdx-1+10)%10; showLbPhoto(); }
-  if (e.key==='ArrowRight')  { lbIdx=(lbIdx+1)%10; showLbPhoto(); }
+  if (e.key === 'Escape')     closeLightbox();
+  if (e.key === 'ArrowLeft')  { currentIdx = (currentIdx - 1 + currentPhotos.length) % currentPhotos.length; showLbPhoto(); }
+  if (e.key === 'ArrowRight') { currentIdx = (currentIdx + 1) % currentPhotos.length; showLbPhoto(); }
 });
 </script>
 
