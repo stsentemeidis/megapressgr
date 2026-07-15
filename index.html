@@ -366,6 +366,35 @@
     .slot-main{ flex-direction:column; align-items:flex-start; gap:4px; }
   }
   @media(prefers-reduced-motion:reduce){ *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;} }
+
+  /* ===================== LANGUAGE SWITCHER (dropdown) ===================== */
+  header nav{ margin-left:auto; }
+  .lang-switch{ position:relative; margin-left:26px; }
+  .lang-toggle{
+    display:inline-flex; align-items:center; gap:7px; background:none;
+    border:1px solid var(--line-strong); border-radius:3px; padding:7px 11px; cursor:pointer;
+    font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--paper-dim); line-height:1; transition:color .2s ease, border-color .2s ease;
+  }
+  .lang-toggle:hover{ color:var(--paper); border-color:var(--paper-dim); }
+  .lang-switch.open .lang-toggle{ color:var(--paper); border-color:var(--paper-dim); }
+  .lang-toggle .chev{ transition:transform .2s ease; }
+  .lang-switch.open .lang-toggle .chev{ transform:rotate(180deg); }
+  .lang-menu{
+    position:absolute; top:calc(100% + 8px); right:0; min-width:154px; list-style:none;
+    background:rgba(19,19,20,0.98); border:1px solid var(--line-strong); border-radius:4px; overflow:hidden;
+    opacity:0; visibility:hidden; transform:translateY(-4px); z-index:120;
+    transition:opacity .18s ease, transform .18s ease, visibility .18s ease; backdrop-filter:blur(8px);
+  }
+  .lang-switch.open .lang-menu{ opacity:1; visibility:visible; transform:translateY(0); }
+  .lang-btn{
+    display:block; width:100%; text-align:left; background:none; border:none; padding:11px 14px; cursor:pointer;
+    font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--paper-dim); transition:color .2s ease, background .2s ease;
+  }
+  .lang-btn:hover{ color:var(--paper); background:rgba(255,255,255,0.05); }
+  .lang-btn.active{ color:var(--orange); }
+  @media(max-width:880px){ .lang-switch{ margin-left:0; } }
 </style>
 </head>
 <body>
@@ -395,6 +424,18 @@
       <li><a href="#on-record" id="navOnRecord">On Record</a></li>
     </ul>
   </nav>
+  <div class="lang-switch" id="langSwitch">
+      <button class="lang-toggle" id="langToggle" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language / Choisir la langue / Επιλογή γλώσσας">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><ellipse cx="12" cy="12" rx="4" ry="9"/></svg>
+        <span id="langCurrent">EN</span>
+        <svg class="chev" width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M2 4l4 4 4-4"/></svg>
+      </button>
+      <ul class="lang-menu" id="langMenu" role="listbox">
+        <li><button class="lang-btn active" data-lang="en" role="option">EN — English</button></li>
+        <li><button class="lang-btn" data-lang="fr" role="option">FR — Français</button></li>
+        <li><button class="lang-btn" data-lang="el" role="option">EL — Ελληνικά</button></li>
+      </ul>
+    </div>
 </header>
 
 <!-- ═══════════════════════════════ HOME PAGE ═══════════════════════════════ -->
@@ -750,7 +791,7 @@
         <div class="slot slot-upcoming">
           <div class="slot-time"><span class="dateline accent">5–13 SEP</span>2026</div>
           <div class="slot-main">
-            <div class="slot-name">Thessaloniki International Fair — 90th, Centenary</div>
+            <div class="slot-name">Thessaloniki International Fair — 90th</div>
             <div class="slot-meta"><span class="tag">Japan — Honoured Country</span><span class="tag">Booking now</span></div>
           </div>
         </div>
@@ -1650,6 +1691,232 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft')  { currentIdx = (currentIdx - 1 + currentPhotos.length) % currentPhotos.length; showLbPhoto(); }
   if (e.key === 'ArrowRight') { currentIdx = (currentIdx + 1) % currentPhotos.length; showLbPhoto(); }
 });
+</script>
+
+<script>
+/* ═══════════════════ LANGUAGE / TRANSLATION SYSTEM ═══════════════════ */
+(function(){
+  const DICT = {
+    fr: {
+      "PHOTO AGENCY":"AGENCE PHOTO",
+      "← Home":"← Accueil",
+      "Coming Up":"À venir",
+      "Why us?":"Pourquoi nous ?",
+      "Partners":"Partenaires",
+      "Contact":"Contact",
+      "On Record":"Réalisations",
+      "Close ✕":"Fermer ✕",
+      "Based in Thessaloniki — working worldwide":"Basé à Thessalonique — actif dans le monde entier",
+      "The story behind":"L'histoire derrière",
+      "every stage.":"chaque scène.",
+      "Megapress covers conferences, summits and exhibition floors for organisers, brands and press teams — fast, unobtrusive, and built around your run-of-show.":"Megapress couvre conférences, sommets et salons pour les organisateurs, les marques et les équipes de presse — rapide, discret et pensé autour de votre déroulé.",
+      "On Record →":"Réalisations →",
+      "Reach the desk →":"Nous contacter →",
+      "Scroll":"Défiler",
+      "On the calendar":"À l'agenda",
+      "Coming up":"À venir",
+      "Confirmed dates later this year — booking now for accreditation, press kits and floor coverage.":"Dates confirmées plus tard cette année — réservations ouvertes pour accréditation, kits presse et couverture des salons.",
+      "The Sixth Thessaloniki Metropolitan Summit":"Le Sixième Sommet Métropolitain de Thessalonique",
+      "Booking now":"Réservations ouvertes",
+      "Thessaloniki International Fair — 90th":"Foire internationale de Thessalonique — 90e",
+      "Japan — Honoured Country":"Japon — Pays à l'honneur",
+      "300+ exhibitors":"300+ exposants",
+      "The case":"L'argument",
+      "Why a specialist?":"Pourquoi un spécialiste ?",
+      "Conferences don't pause for photography. Coverage is planned against the run-of-show, not bolted on after it.":"Les conférences ne s'arrêtent pas pour la photographie. La couverture est planifiée selon le déroulé, et non ajoutée après coup.",
+      "Run-of-show briefing":"Brief du déroulé",
+      "Every keynote, panel and embargo mapped before doors open.":"Chaque keynote, panel et embargo cartographié avant l'ouverture des portes.",
+      "Stage-light fluency":"Maîtrise des éclairages",
+      "Moving spots, LED walls, pyro — exposure built around them, not fighting them.":"Poursuites, murs LED, pyrotechnie — l'exposition construite autour d'eux, sans les combattre.",
+      "Floor-level coverage":"Couverture au sol",
+      "Exhibition booths get the same attention as the main stage.":"Les stands reçoivent la même attention que la scène principale.",
+      "Same-day delivery":"Livraison le jour même",
+      "A culled, edited gallery within 24 hours, sooner on request.":"Une galerie triée et retouchée sous 24 heures, plus tôt sur demande.",
+      "On location, anywhere":"Sur place, partout",
+      "Based in Thessaloniki, travelling across Greece and abroad.":"Basé à Thessalonique, en déplacement dans toute la Grèce et à l'étranger.",
+      "Behind the lens":"Derrière l'objectif",
+      "yrs":"ans",
+      "Events covered":"Événements couverts",
+      "hr":"h",
+      "Standard turnaround":"Délai standard",
+      "Global":"Mondiale",
+      "Availability":"Disponibilité",
+      "Let's cover":"Couvrons",
+      "your next stage.":"votre prochaine scène.",
+      "Tell me the dates, the venue, and what the run-of-show looks like — in Thessaloniki or further afield. I'll confirm availability within one business day.":"Indiquez-moi les dates, le lieu et le déroulé prévu — à Thessalonique ou ailleurs. Je confirme ma disponibilité sous un jour ouvré.",
+      "Download capabilities deck":"Télécharger la brochure",
+      "Conference and exhibition photography for organisers, brands and press teams who need the room captured as it actually happened.":"Photographie de conférences et d'expositions pour les organisateurs, les marques et les équipes de presse qui veulent capturer la salle telle qu'elle s'est réellement déroulée.",
+      "Services":"Services",
+      "Keynote & stage":"Keynote & scène",
+      "Exhibition floor":"Salon d'exposition",
+      "Press & media kits":"Kits presse & médias",
+      "Multi-day coverage":"Couverture multi-jours",
+      "Follow":"Suivez-nous",
+      "© 2026 Megapress Photo Agency. All rights reserved.":"© 2026 Megapress Photo Agency. Tous droits réservés.",
+      "Thessaloniki — working worldwide":"Thessalonique — actif dans le monde entier",
+      "Every assignment documented — conferences, exhibition floors, B2B sessions and pavilion work across Thessaloniki and beyond.":"Chaque mission documentée — conférences, salons, sessions B2B et travaux de pavillon à Thessalonique et au-delà.",
+      "Events & Exhibitions":"Événements & expositions",
+      "Click any row to expand":"Cliquez sur une ligne pour développer",
+      "Pavilions":"Pavillons",
+      "Category":"Catégorie",
+      "All":"Tous",
+      "Event":"Événement",
+      "Exhibition":"Exposition",
+      "Year":"Année"
+    },
+    el: {
+      "PHOTO AGENCY":"ΦΩΤΟΓΡΑΦΙΚΟ ΠΡΑΚΤΟΡΕΙΟ",
+      "← Home":"← Αρχική",
+      "Coming Up":"Προσεχώς",
+      "Why us?":"Γιατί εμείς;",
+      "Partners":"Συνεργάτες",
+      "Contact":"Επικοινωνία",
+      "On Record":"Αρχείο",
+      "Close ✕":"Κλείσιμο ✕",
+      "Based in Thessaloniki — working worldwide":"Με έδρα τη Θεσσαλονίκη — δραστήριοι παγκοσμίως",
+      "The story behind":"Η ιστορία πίσω από",
+      "every stage.":"κάθε σκηνή.",
+      "Megapress covers conferences, summits and exhibition floors for organisers, brands and press teams — fast, unobtrusive, and built around your run-of-show.":"Η Megapress καλύπτει συνέδρια, συνόδους κορυφής και εκθεσιακούς χώρους για διοργανωτές, brands και ομάδες τύπου — γρήγορα, διακριτικά και προσαρμοσμένα στο πρόγραμμά σας.",
+      "On Record →":"Αρχείο →",
+      "Reach the desk →":"Επικοινωνία →",
+      "Scroll":"Κύλιση",
+      "On the calendar":"Στο ημερολόγιο",
+      "Coming up":"Προσεχώς",
+      "Confirmed dates later this year — booking now for accreditation, press kits and floor coverage.":"Επιβεβαιωμένες ημερομηνίες αργότερα φέτος — κρατήσεις τώρα για διαπίστευση, δελτία τύπου και κάλυψη εκθέσεων.",
+      "The Sixth Thessaloniki Metropolitan Summit":"6η Μητροπολιτική Σύνοδος Θεσσαλονίκης",
+      "Booking now":"Κρατήσεις τώρα",
+      "Thessaloniki International Fair — 90th":"Διεθνής Έκθεση Θεσσαλονίκης — 90ή",
+      "Japan — Honoured Country":"Ιαπωνία — Τιμώμενη Χώρα",
+      "300+ exhibitors":"300+ εκθέτες",
+      "The case":"Το επιχείρημα",
+      "Why a specialist?":"Γιατί έναν ειδικό;",
+      "Conferences don't pause for photography. Coverage is planned against the run-of-show, not bolted on after it.":"Τα συνέδρια δεν σταματούν για τη φωτογράφιση. Η κάλυψη σχεδιάζεται με βάση το πρόγραμμα, δεν προστίθεται εκ των υστέρων.",
+      "Run-of-show briefing":"Ενημέρωση προγράμματος",
+      "Every keynote, panel and embargo mapped before doors open.":"Κάθε ομιλία, panel και embargo χαρτογραφείται πριν ανοίξουν οι πόρτες.",
+      "Stage-light fluency":"Άνεση με τον φωτισμό σκηνής",
+      "Moving spots, LED walls, pyro — exposure built around them, not fighting them.":"Κινούμενοι προβολείς, οθόνες LED, πυροτεχνήματα — η έκθεση χτίζεται γύρω τους, όχι ενάντιά τους.",
+      "Floor-level coverage":"Κάλυψη στο επίπεδο του χώρου",
+      "Exhibition booths get the same attention as the main stage.":"Τα περίπτερα λαμβάνουν την ίδια προσοχή με την κεντρική σκηνή.",
+      "Same-day delivery":"Παράδοση αυθημερόν",
+      "A culled, edited gallery within 24 hours, sooner on request.":"Επιμελημένη, επεξεργασμένη συλλογή εντός 24 ωρών, νωρίτερα κατόπιν αιτήματος.",
+      "On location, anywhere":"Επιτόπου, παντού",
+      "Based in Thessaloniki, travelling across Greece and abroad.":"Με έδρα τη Θεσσαλονίκη, με μετακινήσεις σε όλη την Ελλάδα και στο εξωτερικό.",
+      "Behind the lens":"Πίσω από τον φακό",
+      "yrs":"χρ.",
+      "Events covered":"Εκδηλώσεις",
+      "hr":"ώρες",
+      "Standard turnaround":"Τυπικός χρόνος",
+      "Global":"Παγκοσμίως",
+      "Availability":"Διαθεσιμότητα",
+      "Let's cover":"Ας καλύψουμε",
+      "your next stage.":"την επόμενη σκηνή σας.",
+      "Tell me the dates, the venue, and what the run-of-show looks like — in Thessaloniki or further afield. I'll confirm availability within one business day.":"Πείτε μου τις ημερομηνίες, τον χώρο και το πρόγραμμα — στη Θεσσαλονίκη ή αλλού. Επιβεβαιώνω τη διαθεσιμότητα εντός μίας εργάσιμης ημέρας.",
+      "Download capabilities deck":"Λήψη παρουσίασης",
+      "Conference and exhibition photography for organisers, brands and press teams who need the room captured as it actually happened.":"Φωτογράφιση συνεδρίων και εκθέσεων για διοργανωτές, brands και ομάδες τύπου που θέλουν να αποτυπώσουν την αίθουσα όπως πραγματικά συνέβη.",
+      "Services":"Υπηρεσίες",
+      "Keynote & stage":"Ομιλίες & σκηνή",
+      "Exhibition floor":"Εκθεσιακός χώρος",
+      "Press & media kits":"Δελτία τύπου & media kits",
+      "Multi-day coverage":"Κάλυψη πολλών ημερών",
+      "Follow":"Ακολουθήστε",
+      "© 2026 Megapress Photo Agency. All rights reserved.":"© 2026 Megapress Photo Agency. Με επιφύλαξη παντός δικαιώματος.",
+      "Thessaloniki — working worldwide":"Θεσσαλονίκη — δραστήριοι παγκοσμίως",
+      "Every assignment documented — conferences, exhibition floors, B2B sessions and pavilion work across Thessaloniki and beyond.":"Κάθε ανάθεση τεκμηριωμένη — συνέδρια, εκθέσεις, B2B sessions και εργασίες περιπτέρων στη Θεσσαλονίκη και πέραν αυτής.",
+      "Events & Exhibitions":"Εκδηλώσεις & Εκθέσεις",
+      "Click any row to expand":"Κάντε κλικ σε μια σειρά για ανάπτυξη",
+      "Pavilions":"Περίπτερα",
+      "Category":"Κατηγορία",
+      "All":"Όλα",
+      "Event":"Εκδήλωση",
+      "Exhibition":"Έκθεση",
+      "Year":"Έτος"
+    }
+  };
+
+  /* Pattern rules for repeated dynamic strings (photo counts, dateline prefixes, pavilion labels) */
+  const RULES = [
+    {re:/\bphotographs\b/g, fr:"photographies", el:"φωτογραφίες"},
+    {re:/\bphotos\b/g,      fr:"photos",        el:"φωτογραφίες"},
+    {re:/\bEVENT\b/g,       fr:"ÉVÉN.",         el:"ΕΚΔΗΛ."},
+    {re:/\bEXHIB\b/g,       fr:"EXPO",          el:"ΕΚΘ."},
+    {re:/\bInternal\b/g,    fr:"Intérieur",     el:"Εσωτερικά"},
+    {re:/\bExternal\b/g,    fr:"Extérieur",     el:"Εξωτερικά"}
+  ];
+
+  const SKIP = {SCRIPT:1, STYLE:1, NOSCRIPT:1, svg:1, SVG:1};
+  const store = [];
+
+  function collect(){
+    const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode(n){
+        if(!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        let p = n.parentNode;
+        while(p && p !== document.body){
+          const t = p.tagName;
+          if(t && (SKIP[t] || p.namespaceURI === "http://www.w3.org/2000/svg")) return NodeFilter.FILTER_REJECT;
+          if(p.classList && p.classList.contains("lang-btn")) return NodeFilter.FILTER_REJECT;
+          p = p.parentNode;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    let n; while((n = w.nextNode())) store.push({node:n, en:n.nodeValue});
+  }
+
+  function apply(lang){
+    store.forEach(({node, en})=>{
+      if(lang === "en"){ node.nodeValue = en; return; }
+      const key = en.trim();
+      const d = DICT[lang];
+      if(d && Object.prototype.hasOwnProperty.call(d, key)){
+        node.nodeValue = en.replace(key, d[key]);
+      } else {
+        let v = en, hit = false;
+        RULES.forEach(r=>{ const nv = v.replace(r.re, r[lang]); if(nv !== v){ hit = true; v = nv; } });
+        node.nodeValue = hit ? v : en;
+      }
+    });
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".lang-btn").forEach(b=> b.classList.toggle("active", b.dataset.lang === lang));
+    try{ localStorage.setItem("mp_lang", lang); }catch(e){}
+  }
+
+  function init(){
+    collect();
+    document.querySelectorAll(".lang-btn").forEach(b=>{
+      b.addEventListener("click", ()=> apply(b.dataset.lang));
+    });
+    let saved = "en";
+    try{ saved = localStorage.getItem("mp_lang") || "en"; }catch(e){}
+    apply(saved);
+  }
+
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>
+
+<script>
+/* ═══════════════════ LANGUAGE DROPDOWN BEHAVIOUR ═══════════════════ */
+(function(){
+  const sw  = document.getElementById("langSwitch");
+  const tg  = document.getElementById("langToggle");
+  const cur = document.getElementById("langCurrent");
+  if(!sw || !tg || !cur) return;
+  function close(){ sw.classList.remove("open"); tg.setAttribute("aria-expanded","false"); }
+  let saved = "en"; try{ saved = localStorage.getItem("mp_lang") || "en"; }catch(e){}
+  cur.textContent = saved.toUpperCase();
+  tg.addEventListener("click", e=>{
+    e.stopPropagation();
+    const open = sw.classList.toggle("open");
+    tg.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  sw.querySelectorAll(".lang-btn").forEach(b=>{
+    b.addEventListener("click", ()=>{ cur.textContent = b.dataset.lang.toUpperCase(); close(); });
+  });
+  document.addEventListener("click", e=>{ if(!sw.contains(e.target)) close(); });
+  document.addEventListener("keydown", e=>{ if(e.key === "Escape") close(); });
+})();
 </script>
 
 </body>
