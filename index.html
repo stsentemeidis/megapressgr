@@ -139,9 +139,9 @@
 
   /* ===================== SECTIONS SHARED ===================== */
   section{ padding:140px 0; position:relative; }
-  #upcoming{ padding-top:48px; padding-bottom:64px; }
+  #upcoming{ padding-top:48px; padding-bottom:28px; }
   #upcoming .section-head{ margin-bottom:36px; }
-  #why-us{ padding-bottom:32px; }
+  #why-us{ padding-top:56px; padding-bottom:32px; }
   .testimonial{ border-top:1px solid var(--line); text-align:center; margin-top:80px; }
   .section-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:40px; margin-bottom:64px; flex-wrap:wrap; }
   h2.section-title{ font-family:var(--display); font-weight:700; font-size:clamp(30px,4.2vw,52px); line-height:1.05; letter-spacing:-0.02em; margin-top:14px; }
@@ -1891,9 +1891,7 @@ document.addEventListener('keydown', e => {
     document.querySelectorAll(".lang-btn").forEach(b=>{
       b.addEventListener("click", ()=> apply(b.dataset.lang));
     });
-    let saved = "en";
-    try{ saved = localStorage.getItem("mp_lang") || "en"; }catch(e){}
-    apply(saved);
+    apply("en");
   }
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
@@ -1909,8 +1907,7 @@ document.addEventListener('keydown', e => {
   const cur = document.getElementById("langCurrent");
   if(!sw || !tg || !cur) return;
   function close(){ sw.classList.remove("open"); tg.setAttribute("aria-expanded","false"); }
-  let saved = "en"; try{ saved = localStorage.getItem("mp_lang") || "en"; }catch(e){}
-  cur.textContent = saved.toUpperCase();
+  cur.textContent = "EN";
   tg.addEventListener("click", e=>{
     e.stopPropagation();
     const open = sw.classList.toggle("open");
