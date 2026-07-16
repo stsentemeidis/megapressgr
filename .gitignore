@@ -1,0 +1,8 @@
+# Master originals — kept locally as backup, never pushed to the repo/site.
+# The live site serves only thumbs/ (clean) and watermarked/ (full-size).
+# Leading slash anchors to the repo root so thumbs/ and watermarked/ mirrors
+# of these folders are still tracked and deployed.
+/Events/
+/Exhibitions/
+/Pavilions/
+/B2B/

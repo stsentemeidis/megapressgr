@@ -1496,22 +1496,24 @@ function thumbsAvailable() {
 
 // Build a photo grid. Thumbnails (thumbs/) used for the grid,
 // originals used for the lightbox.
-function buildPhotoGrid(grid, photos, thumbs) {
+function buildPhotoGrid(grid, photos, thumbs, fulls) {
   grid._photos = photos;
+  const lightboxSet = (fulls && fulls.length) ? fulls : photos;
   photos.forEach((src, i) => {
     const thumbSrc = (thumbs && thumbs[i]) ? thumbs[i] : src;
+    const fullSrc  = (fulls  && fulls[i])  ? fulls[i]  : src;
     const card = document.createElement('div');
     card.className = 'photo-card loading';
-    card.dataset.src   = thumbSrc;  // grid loads thumbnail
-    card.dataset.full  = src;       // lightbox loads original
+    card.dataset.src   = thumbSrc;  // grid loads clean thumbnail
+    card.dataset.full  = fullSrc;   // lightbox loads watermarked full copy
 
     const img = document.createElement('img');
     img.alt = `Photo ${i+1}`;
     img.loading = 'lazy';
     img.addEventListener('load',  () => card.classList.remove('loading'));
     img.addEventListener('error', () => {
-      // thumbnail failed — fall back to original
-      if (img.src !== src) { img.src = src; card.dataset.src = src; }
+      // thumbnail failed — fall back to the watermarked copy (originals are not deployed)
+      if (img.src !== fullSrc) { img.src = fullSrc; card.dataset.src = fullSrc; }
       else card.classList.remove('loading');
     });
 
@@ -1525,7 +1527,7 @@ function buildPhotoGrid(grid, photos, thumbs) {
     card.appendChild(img);
     card.appendChild(ov);
     grid.appendChild(card);
-    card.addEventListener('click', () => openLightbox(photos, i));
+    card.addEventListener('click', () => openLightbox(lightboxSet, i));
   });
 }
 
@@ -1536,16 +1538,19 @@ function buildPhotoGrid(grid, photos, thumbs) {
   function buildAll(useThumb) {
     _thumbsAvailable = useThumb;
     allGrids.forEach(grid => {
-      let photos = [], thumbs = null;
+      let photos = [], thumbs = null, fulls = null;
       if (grid.dataset.folder && grid.dataset.photos !== undefined) {
         const folder = grid.dataset.folder;
         const files  = grid.dataset.photos.split(',').map(f => f.trim()).filter(Boolean);
         photos = files.map(f => `${folder}/${f}`);
-        if (useThumb) thumbs = files.map(f => `thumbs/${folder}/${f}`);
+        if (useThumb) {
+          thumbs = files.map(f => `thumbs/${folder}/${f}`);
+          fulls  = files.map(f => `watermarked/${folder}/${f}`);  // watermarked, for lightbox
+        }
       } else if (grid.dataset.seeds) {
         photos = grid.dataset.seeds.split(',').map(s => `https://picsum.photos/seed/${s.trim()}/600/400`);
       }
-      buildPhotoGrid(grid, photos, thumbs);
+      buildPhotoGrid(grid, photos, thumbs, fulls);
     });
   }
 

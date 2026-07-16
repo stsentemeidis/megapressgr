@@ -2,3 +2,18 @@
 .gitignore
 node_modules
 .DS_Store
+
+# Do not deploy the full-resolution master originals — the site only serves
+# clean thumbnails (thumbs/) and watermarked full-size copies (watermarked/).
+# Leading slash anchors to the repo root so thumbs/ and watermarked/ mirrors
+# of these folders are still served.
+/Events/
+/Exhibitions/
+/Pavilions/
+/B2B/
+
+# Source/working files that don't belong on the live site
+*.pptx
+create_thumbs.py
+embed_metadata.py
+assets/
