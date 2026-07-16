@@ -6,3 +6,10 @@
 /Exhibitions/
 /Pavilions/
 /B2B/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
