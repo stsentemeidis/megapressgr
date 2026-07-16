@@ -1988,6 +1988,18 @@ document.addEventListener('keydown', e => {
     }
   });
 })();
+
+/* ═══════════════════ KEEP URL CLEAN (no trailing #) ═══════════════════ */
+(function(){
+  // stop href="#" links from appending a bare # to the address bar
+  document.querySelectorAll('a[href="#"]').forEach(a=>{
+    a.addEventListener("click", e=> e.preventDefault());
+  });
+  // strip a lone # if it's already there on load
+  if(location.hash === "#"){
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+})();
 </script>
 
 </body>
