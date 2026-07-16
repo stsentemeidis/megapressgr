@@ -395,6 +395,13 @@
   .lang-btn:hover{ color:var(--paper); background:rgba(255,255,255,0.05); }
   .lang-btn.active{ color:var(--orange); }
   @media(max-width:880px){ .lang-switch{ margin-left:0; } }
+
+  /* ===================== IMAGE SAVE DETERRENTS ===================== */
+  img{ -webkit-user-drag:none; -khtml-user-drag:none; -moz-user-drag:none; user-drag:none; }
+  .photo-card, .photo-card img, .lightbox, .lightbox-img{
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
+  }
 </style>
 </head>
 <body>
@@ -1923,6 +1930,26 @@ document.addEventListener('keydown', e => {
   });
   document.addEventListener("click", e=>{ if(!sw.contains(e.target)) close(); });
   document.addEventListener("keydown", e=>{ if(e.key === "Escape") close(); });
+})();
+</script>
+
+<script>
+/* ═══════════════════ IMAGE SAVE DETERRENTS ═══════════════════ */
+(function(){
+  function isProtected(t){
+    return t && (t.tagName === "IMG" || (t.closest && t.closest(".photo-card, .photo-grid, .lightbox")));
+  }
+  // block right-click / long-press menu on images and gallery
+  document.addEventListener("contextmenu", e=>{ if(isProtected(e.target)) e.preventDefault(); });
+  // block drag-to-save
+  document.addEventListener("dragstart", e=>{ if(e.target && e.target.tagName === "IMG") e.preventDefault(); });
+  // block Ctrl/Cmd+S while the lightbox is open
+  document.addEventListener("keydown", e=>{
+    const lb = document.getElementById("lightbox");
+    if(lb && lb.classList.contains("active") && (e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S")){
+      e.preventDefault();
+    }
+  });
 })();
 </script>
 
