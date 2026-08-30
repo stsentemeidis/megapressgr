@@ -12,7 +12,7 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
 }));
 
 // year select
-(function(){ const y=new Date().getFullYear(); const sel=$('#evYear'); for(let i=y+1;i>=2023;i--){const o=document.createElement('option');o.value=i;o.textContent=i;if(i===y)o.selected=true;sel.appendChild(o);} })();
+(function(){ const y=new Date().getFullYear(); const sel=$('#evYear'); for(let i=y+1;i>=y-1;i--){const o=document.createElement('option');o.value=i;o.textContent=i;if(i===y)o.selected=true;sel.appendChild(o);} })();
 
 // type toggle
 let evType='event';
