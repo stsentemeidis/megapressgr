@@ -22,7 +22,7 @@ pattern = "admin.megapressevents.com"
 custom_domain = true
 
 [vars]
-GITHUB_REPO = "REPLACE_WITH_owner/megapressgr"   # e.g. stsentemeidis/megapressgr
+GITHUB_REPO = "stsentemeidis/megapressgr"   # your GitHub owner/repo — correct if different
 GITHUB_BRANCH = "main"
 MEDIA_BASE = "https://media.megapressevents.com"
 
