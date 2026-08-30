@@ -77,6 +77,7 @@
   <div class="tabs">
     <button class="tab active" data-tab="event">Add event</button>
     <button class="tab" data-tab="upcoming">Add upcoming</button>
+    <button class="tab" data-tab="gallery">Pavilions &amp; B2B</button>
     <button class="tab" data-tab="manage">Manage / delete</button>
     <button class="tab" data-tab="partners">Partners</button>
     <button class="tab" data-tab="clients">Clients</button>
@@ -119,6 +120,26 @@
       <div class="field"><label>Tags</label><div class="tagline"><input type="text" id="upTag" placeholder="Optional — e.g. Economist Impact & Hazlis & Rivas"></div><div class="chips" id="upChips"></div><p class="hint">"Booking now" is added automatically. The date label (e.g. 3–4 SEP · 2026) is generated from the dates.</p></div>
       <div class="actions"><button class="btn btn-primary" id="publishUp">Publish upcoming</button><span class="status" id="upStatus"></span></div>
     </section>
+    <!-- PAVILIONS & B2B -->
+    <section class="panel" id="p-gallery">
+      <h1 class="panel-title">Pavilions &amp; B2B</h1>
+      <p class="panel-note">Add photos to a fixed gallery. They're watermarked and thumbnailed automatically, then appended to that gallery on the site.</p>
+      <div class="field"><label>Gallery</label>
+        <select id="gSel">
+          <option value="b2b">B2B</option>
+          <option value="pavInside">Pavilions — Internal</option>
+          <option value="pavOutside">Pavilions — External</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Photos</label>
+        <input type="file" id="gFile" accept="image/jpeg,image/jpg" multiple style="display:none">
+        <div class="dropzone" id="gDz"><div class="dz-main">Click to choose photos</div><div class="dz-sub">JPG — added to the selected gallery</div></div>
+        <div class="thumbs" id="gThumbs"></div>
+      </div>
+      <div class="actions"><button class="btn btn-primary" id="publishG">Add photos</button><span class="status" id="gStatus"></span></div>
+    </section>
+
     <!-- MANAGE -->
     <section class="panel" id="p-manage">
       <h1 class="panel-title">Manage events</h1>

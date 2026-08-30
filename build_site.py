@@ -2,7 +2,7 @@ import json, re, datetime
 from pathlib import Path
 ROOT=Path(__file__).parent
 def load(n): return json.load(open(ROOT/"data"/f"{n}.json", encoding="utf-8"))
-events=load("events"); upcoming=load("upcoming"); partners=load("partners"); clients=load("clients"); stats=load("stats")
+events=load("events"); upcoming=load("upcoming"); partners=load("partners"); clients=load("clients"); stats=load("stats"); galleries=load("galleries")
 TODAY=datetime.date.today()  # real build date drives auto-hide of past upcoming
 def esc(s): return str(s).replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
 
@@ -93,6 +93,28 @@ def render_stats():
         out.append(f'<div class="stat">{num}<div class="stat-label">{esc(s["label"])}</div></div>')
     return "\n        "+"\n        ".join(out)
 
+# ---------- GALLERIES (Pavilions + B2B) ----------
+def _pav_set(key, active):
+    s=galleries[key]; n=len(s["photos"]); pid="inside" if key=="pavInside" else "outside"
+    return (f'      <div class="pav-set{" active" if active else ""}" id="pav-{pid}">\n'
+            f'        <div class="photo-count-bar" style="margin-bottom:16px;">\n'
+            f'          <span class="photo-count-label"><em>{n}</em> photographs — {esc(s["label"])}</span>\n'
+            f'        </div>\n'
+            f'        <div class="photo-grid pav-grid" data-folder="{s["folder"]}" data-photos="{",".join(s["photos"])}"></div>\n'
+            f'      </div>')
+def render_pav():
+    return ('\n      <div class="pav-toggle-bar">\n'
+            '        <button class="pav-toggle active" data-pav="inside">Internal</button>\n'
+            '        <button class="pav-toggle" data-pav="outside">External</button>\n'
+            '      </div>\n'
+            + _pav_set("pavInside", True) + "\n" + _pav_set("pavOutside", False) + "\n    ")
+def render_b2b():
+    s=galleries["b2b"]; n=len(s["photos"])
+    return ('\n      <div class="photo-count-bar" style="margin-bottom:20px;">\n'
+            f'        <span class="photo-count-label"><em>{n}</em> photographs — {esc(s["label"])}</span>\n'
+            '      </div>\n'
+            f'      <div class="photo-grid" data-folder="{s["folder"]}" data-photos="{",".join(s["photos"])}"></div>\n    ')
+
 html=open(ROOT/"index.html", encoding="utf-8").read()
 regions=[
  ("EVENTS", r'(<div class="programme" id="eeList">)([\s\S]*?)(</div><!-- /eeList -->)', render_events()),
@@ -100,6 +122,8 @@ regions=[
  ("PARTNERS", r'(<section class="partners" id="partners">[\s\S]*?<div class="partners-track">)([\s\S]*?)(</div>\s*</div>\s*</section>)', render_partners()),
  ("CLIENTS", r'(<div class="clients">[\s\S]*?<div class="partners-track">)([\s\S]*?)(\n      </div>\n    </div>\n  </div>)', render_clients()),
  ("STATS", r'(<div class="stats-grid">)([\s\S]*?)(\n      </div>\n    </div>\n  </div>)', render_stats()),
+ ("PAV", r'(<div class="or-panel" id="or-panel-pav">\s*<div class="wrap">)([\s\S]*?)(</div>\s*</div><!-- /panel pav -->)', render_pav()),
+ ("B2B", r'(<div class="or-panel" id="or-panel-b2b">\s*<div class="wrap">)([\s\S]*?)(</div>\s*</div><!-- /panel b2b -->)', render_b2b()),
 ]
 def norm(s): return re.sub(r'\s+',' ', re.sub(r'>\s+<','><', s)).strip()
 built=html

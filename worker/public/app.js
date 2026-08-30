@@ -67,6 +67,25 @@ $('#publishUp').addEventListener('click', async function(){
   this.disabled=false;
 });
 
+// ---- pavilions / b2b galleries ----
+const GALLERY_FOLDER = { b2b:"B2B", pavInside:"Pavilions/Inside", pavOutside:"Pavilions/Outside" };
+let gfiles=[];
+$('#gDz').addEventListener('click',()=>$('#gFile').click());
+$('#gFile').addEventListener('change',e=>{ gfiles=[...e.target.files]; const t=$('#gThumbs'); t.innerHTML=''; gfiles.forEach(f=>{const d=document.createElement('div');d.className='thumb';const img=document.createElement('img');img.src=URL.createObjectURL(f);d.appendChild(img);t.appendChild(d);}); });
+$('#publishG').addEventListener('click', async function(){
+  const gallery=$('#gSel').value, folder=GALLERY_FOLDER[gallery];
+  if(!gfiles.length){ setStatus('#gStatus','Add at least one photo','err'); return; }
+  this.disabled=true; setStatus('#gStatus','<span class="spin"></span> Uploading…');
+  try{
+    for(let i=0;i<gfiles.length;i++){ setStatus('#gStatus',`<span class="spin"></span> Uploading ${i+1}/${gfiles.length}…`); await fetch(`/api/upload?folder=${encodeURIComponent(folder)}&name=${encodeURIComponent(gfiles[i].name)}`,{method:'POST',body:gfiles[i]}); }
+    setStatus('#gStatus','<span class="spin"></span> Publishing…');
+    await api('add-gallery',{method:'POST',body:JSON.stringify({gallery,folder,photos:gfiles.map(f=>f.name)})});
+    setStatus('#gStatus','Added — processing on the server. Live in a minute or two.','ok');
+    $('#gThumbs').innerHTML='';gfiles=[];$('#gFile').value='';
+  }catch(e){ setStatus('#gStatus','Error: '+e.message,'err'); }
+  this.disabled=false;
+});
+
 // ---- monochrome logo processing (browser canvas) ----
 function processLogo(file){ return new Promise((res)=>{ const img=new Image(); img.onload=()=>{ const max=200,sc=Math.min(1,max/Math.max(img.width,img.height)); const w=Math.round(img.width*sc),h=Math.round(img.height*sc); const cv=document.createElement('canvas');cv.width=w;cv.height=h;const ctx=cv.getContext('2d');ctx.drawImage(img,0,0,w,h); const d=ctx.getImageData(0,0,w,h); const px=d.data; for(let i=0;i<px.length;i+=4){ const lum=0.299*px[i]+0.587*px[i+1]+0.114*px[i+2]; let a=px[i+3]; if(a>10){ a=Math.round(a*(1-lum/255)); } px[i]=242;px[i+1]=241;px[i+2]=238;px[i+3]=a; } ctx.putImageData(d,0,0); cv.toBlob(b=>res(b),'image/png'); }; img.src=URL.createObjectURL(file); }); }
 

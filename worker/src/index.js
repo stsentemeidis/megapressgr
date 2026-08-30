@@ -115,6 +115,13 @@ async function handleApi(request, env, url) {
     return json({ ok: true, id: ev.id });
   }
 
+  // POST /api/add-gallery — add photos to Pavilions/B2B (triggers the same Action)
+  if (p === "add-gallery" && request.method === "POST") {
+    const g = await request.json();   // { gallery, folder, photos: [...] }
+    await ghDispatch(env, "process-event", g);
+    return json({ ok: true });
+  }
+
   // POST /api/add-upcoming
   if (p === "add-upcoming" && request.method === "POST") {
     const u = await request.json();

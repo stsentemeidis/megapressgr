@@ -82,10 +82,8 @@ def put_jpeg(img, key, q):
     img.save(buf, "JPEG", quality=q, optimize=True, exif=make_exif())
     s3.put_object(Bucket=BUCKET, Key=key, Body=buf.getvalue(), ContentType="image/jpeg")
 
-def main():
-    ev = json.loads(os.environ["EVENT_JSON"])
-    folder = ev["folder"]
-    incoming = ev["photos"]
+def process_photos(folder, incoming):
+    """Download each original from _incoming/, write thumb + watermarked to R2, discard original."""
     processed = []
     for fn in incoming:
         src_key = f"_incoming/{folder}/{fn}"
@@ -98,7 +96,27 @@ def main():
         s3.delete_object(Bucket=BUCKET, Key=src_key)   # discard the original
         processed.append(fn)
         print(f"  processed {fn}")
+    return processed
 
+def main():
+    ev = json.loads(os.environ["EVENT_JSON"])
+
+    # ---- Gallery mode (Pavilions / B2B): append photos to an existing gallery ----
+    gallery = ev.get("gallery")
+    if gallery:
+        gp = ROOT / "data" / "galleries.json"
+        gal = json.load(open(gp, encoding="utf-8"))
+        folder = ev.get("folder") or gal[gallery]["folder"]
+        processed = process_photos(folder, ev["photos"])
+        existing = gal[gallery]["photos"]
+        gal[gallery]["photos"] = existing + [p for p in processed if p not in existing]
+        json.dump(gal, open(gp, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+        print(f"Added {len(processed)} photos to gallery '{gallery}'.")
+        return
+
+    # ---- Event mode ----
+    folder = ev["folder"]
+    processed = process_photos(folder, ev["photos"])
     name = ev["name"]; year = ev["year"]
     entry = {
         "id": ev["id"],

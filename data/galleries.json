@@ -1,0 +1,5 @@
+{
+  "pavInside":  { "folder": "Pavilions/Inside",  "label": "Internal", "photos": ["SPYR0395.JPG","SPYR6682.JPG","SPYR6697.JPG","SPYR6710.JPG","SPYR6735.JPG"] },
+  "pavOutside": { "folder": "Pavilions/Outside", "label": "External", "photos": ["SPYR4075.JPG","SPYR4156.JPG","SPYR4295.JPG","SPYR6600.JPG"] },
+  "b2b":        { "folder": "B2B",               "label": "B2B",      "photos": ["SPYR2153.JPG","SPYR2195.JPG","SPYR3170.JPG","SPYR3200.JPG","SPYR3207.JPG","SPYR4199.JPG","SPYR4200.JPG","SPYR4889.JPG","SPYR4890.JPG","SPYR5577.JPG"] }
+}
