@@ -66,6 +66,18 @@ const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)
 async function handleApi(request, env, url) {
   const p = url.pathname.replace(/^\/api\//, "");
 
+  // GET /api/debug — confirms the token/vars reached the Worker (safe: no secret shown)
+  if (p === "debug" && request.method === "GET") {
+    const t = env.GITHUB_TOKEN || "";
+    return json({
+      hasToken: !!t,
+      tokenLength: t.length,
+      tokenLooksValid: t.startsWith("github_pat_") || t.startsWith("ghp_"),
+      repo: env.GITHUB_REPO,
+      branch: env.GITHUB_BRANCH,
+    });
+  }
+
   // GET /api/data — current content for the Manage/edit views
   if (p === "data" && request.method === "GET") {
     const names = ["events", "upcoming", "partners", "clients", "stats"];
