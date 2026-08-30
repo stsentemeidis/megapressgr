@@ -1,6 +1,6 @@
 [
   { "id": "years", "value": "40", "unit": "yrs", "label": "Behind the lens", "fixed": false },
-  { "id": "events", "value": "500", "unit": "+", "label": "Events covered", "fixed": false },
+  { "id": "events", "value": "501", "unit": "+", "label": "Events covered", "fixed": false },
   { "id": "turnaround", "value": "24", "unit": "hr", "label": "Standard turnaround", "fixed": false },
   { "id": "availability", "value": "Global", "unit": "", "label": "Availability", "fixed": true, "isWord": true }
 ]
