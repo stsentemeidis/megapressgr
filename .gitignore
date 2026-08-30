@@ -6,3 +6,6 @@
 /Exhibitions/
 /Pavilions/
 /B2B/
+
+# Build artifact — the site is generated in place into index.html
+index.built.html

@@ -16,4 +16,6 @@ node_modules
 *.pptx
 create_thumbs.py
 embed_metadata.py
+build_site.py
+index.built.html
 assets/

@@ -1,0 +1,101 @@
+[
+  {
+    "id": "concert-hall-david-pastor-timelapse-2026",
+    "category": "event",
+    "year": 2026,
+    "shortLabel": "Concert Hall",
+    "name": "Thessaloniki Concert Hall — David Pastor, Timelapse",
+    "caption": "Thessaloniki Concert Hall, David Pastor Timelapse 2026",
+    "extraTags": [],
+    "folder": "Events/Thessaloniki Concert Hall - DAVID PASTOR TIMELAPSE 2026",
+    "photos": ["SPYR9185.JPG","SPYR9241.JPG","SPYR9260.JPG","SPYR9268.JPG","SPYR9287.JPG","SPYR9302.JPG","SPYR9329.JPG","SPYR9388.JPG"]
+  },
+  {
+    "id": "7th-balkan-forum-2026",
+    "category": "event",
+    "year": 2026,
+    "shortLabel": "7th Balkan Forum",
+    "name": "7th Balkan Forum — Shipping and Northern Greece",
+    "caption": "7th Balkan Forum 2026",
+    "extraTags": ["40+ Speakers"],
+    "folder": "Events/7th Balkan Forum 2026",
+    "photos": ["PAV_8110.JPG","PAV_8182.JPG","PAV_8322.JPG","PAV_8531.JPG","SPYR2309.JPG","SPYR2314.JPG","SPYR8385.JPG","SPYR8565.JPG","SPYR8645.JPG"]
+  },
+  {
+    "id": "blue-heritage-summit-thessaloniki-2026",
+    "category": "event",
+    "year": 2026,
+    "shortLabel": "Blue Heritage",
+    "name": "Blue Heritage Summit Thessaloniki",
+    "caption": "Blue Heritage Summit 2026",
+    "extraTags": [],
+    "folder": "Events/Blue Heritage Summit Thessaloniki 2026",
+    "photos": ["MAKP0576.JPG","MAKP0793.JPG","MAKP0876.JPG","MAKP1147.JPG","SPYR1193.JPG","SPYR1239.JPG","SPYR1263.JPG","SPYR1538.JPG","SPYR1539.JPG","SPYR1579.JPG"]
+  },
+  {
+    "id": "agrotica-2026",
+    "category": "exhibition",
+    "year": 2026,
+    "shortLabel": "Agrotica",
+    "name": "Agrotica — Agricultural Machinery & Equipment",
+    "caption": "Agrotica 2026",
+    "extraTags": [],
+    "folder": "Exhibitions/Agrotica 2026",
+    "photos": ["SPYR0049.JPG","SPYR0092.JPG","SPYR0287.JPG","SPYR0388.JPG","SPYR0836.JPG","SPYR0949.JPG","SPYR9872.JPG","SPYR9907.JPG","SPYR9931.JPG","SPYR9997.JPG"]
+  },
+  {
+    "id": "artozyma-2026",
+    "category": "exhibition",
+    "year": 2026,
+    "shortLabel": "Artozyma",
+    "name": "Artozyma — Bakery & Confectionery",
+    "caption": "Artozyma 2026",
+    "extraTags": [],
+    "folder": "Exhibitions/ARTOZYMA 2026",
+    "photos": ["SPYR3069.JPG","SPYR3172.JPG","SPYR3313.JPG","SPYR3389.JPG","SPYR4214.JPG","SPYR4222.JPG","SPYR4251.JPG","SPYR4311.JPG","SPYR4329.JPG","SPYR4585.JPG"]
+  },
+  {
+    "id": "fifth-economist-summit-2025",
+    "category": "event",
+    "year": 2025,
+    "shortLabel": "Economist",
+    "name": "The Fifth Economist Thessaloniki Metropolitan Summit",
+    "caption": "Fifth Economist Thessaloniki Metropolitan Summit 2025",
+    "extraTags": [],
+    "folder": "Events/The 5th Economist Thessaloniki Metropolitan Summit 2025",
+    "photos": ["SPYR1398.JPG","SPYR1459.JPG","SPYR1494.JPG","SPYR1951.JPG","SPYR2258.JPG","SPYR2376.JPG","SPYR2683.JPG","SPYR2734.JPG","SPYR2770.JPG","SPYR3114.JPG"]
+  },
+  {
+    "id": "hydro-2025",
+    "category": "event",
+    "year": 2025,
+    "shortLabel": "HYDRO",
+    "name": "HYDRO",
+    "caption": "HYDRO 2025",
+    "extraTags": [],
+    "folder": "Events/Hydro 2025",
+    "photos": ["SPYR0239.JPG","SPYR3281.JPG","SPYR3384.JPG","SPYR3423.JPG","SPYR3622.JPG","SPYR3627.JPG","SPYR3657.JPG","SPYR3813.JPG","SPYR3908.JPG","SPYR4654.JPG"]
+  },
+  {
+    "id": "concert-hall-mousa-2025",
+    "category": "event",
+    "year": 2025,
+    "shortLabel": "Concert Hall",
+    "name": "Thessaloniki Concert Hall — Mousa Concert, Travelling to Austria",
+    "caption": "Thessaloniki Concert Hall 2025",
+    "extraTags": [],
+    "folder": "Events/Thessaloniki Concert Hall - Mousa Concert 2025",
+    "photos": ["SPYR1138.JPG","SPYR1301.JPG","SPYR1312.JPG","SPYR1316.JPG","SPYR1323.JPG","SPYR1440.JPG","SPYR1470.JPG","SPYR1532.JPG","SPYR1547.JPG","SPYR5759.JPG"]
+  },
+  {
+    "id": "philoxenia-hotelia-2025",
+    "category": "exhibition",
+    "year": 2025,
+    "shortLabel": "Philoxenia",
+    "name": "Philoxenia — Hotelia",
+    "caption": "Philoxenia-Hotelia 2025",
+    "extraTags": [],
+    "folder": "Exhibitions/Philoxenia-Hotelia 2025",
+    "photos": ["SPYR4317.JPG","SPYR4320.JPG","SPYR4335.JPG","SPYR4435.JPG","SPYR4450.JPG","SPYR4475.JPG","SPYR4478.JPG","SPYR4490.JPG","SPYR4502.JPG","SPYR4573.JPG"]
+  }
+]
