@@ -6,7 +6,9 @@
     "endDate": "2026-09-04",
     "dateLabel": "3–4 SEP",
     "year": 2026,
-    "extraTags": ["Economist Impact & Hazlis & Rivas"]
+    "extraTags": [
+      "Economist Impact & Hazlis & Rivas"
+    ]
   },
   {
     "id": "tif-90th-2026",
@@ -15,7 +17,9 @@
     "endDate": "2026-09-13",
     "dateLabel": "5–13 SEP",
     "year": 2026,
-    "extraTags": ["Japan — Honoured Country"]
+    "extraTags": [
+      "Japan — Honoured Country"
+    ]
   },
   {
     "id": "philoxenia-hotelia-2026",
@@ -24,6 +28,8 @@
     "endDate": "2026-11-15",
     "dateLabel": "13–15 NOV",
     "year": 2026,
-    "extraTags": ["300+ exhibitors"]
+    "extraTags": [
+      "300+ exhibitors"
+    ]
   }
 ]
