@@ -1,6 +1,6 @@
 import json, re, datetime
 from pathlib import Path
-ROOT=Path("/sessions/festive-ecstatic-archimedes/mnt/megapressgr")
+ROOT=Path(__file__).parent
 def load(n): return json.load(open(ROOT/"data"/f"{n}.json", encoding="utf-8"))
 events=load("events"); upcoming=load("upcoming"); partners=load("partners"); clients=load("clients"); stats=load("stats")
 TODAY=datetime.date.today()  # real build date drives auto-hide of past upcoming
