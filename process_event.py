@@ -37,12 +37,15 @@ ARTIST    = "Spyridon Makridis / Megapress"
 COPYRIGHT = "(C) 2026 Megapress Photo Agency. All rights reserved. info@megapressevents.com"
 DESC      = "Megapress - Conference & Exhibition Photography, Thessaloniki"
 
-BUCKET = os.environ["R2_BUCKET"]
+def _env(k):
+    return os.environ[k].strip()  # strip stray spaces/newlines from pasted secrets
+
+BUCKET = _env("R2_BUCKET")
 s3 = boto3.client(
     "s3",
-    endpoint_url=f'https://{os.environ["R2_ACCOUNT_ID"]}.r2.cloudflarestorage.com',
-    aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"],
-    aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],
+    endpoint_url=f'https://{_env("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com',
+    aws_access_key_id=_env("R2_ACCESS_KEY_ID"),
+    aws_secret_access_key=_env("R2_SECRET_ACCESS_KEY"),
     region_name="auto",
 )
 
