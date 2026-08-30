@@ -1,19 +1,5 @@
 [
   {
-    "id": "test-test-2027",
-    "category": "exhibition",
-    "year": 2027,
-    "shortLabel": "test test",
-    "name": "test test",
-    "caption": "test test 2027",
-    "extraTags": [],
-    "folder": "Exhibitions/test test 2027",
-    "photos": [
-      "images (1).jpg",
-      "images.jpg"
-    ]
-  },
-  {
     "id": "concert-hall-david-pastor-timelapse-2026",
     "category": "event",
     "year": 2026,
