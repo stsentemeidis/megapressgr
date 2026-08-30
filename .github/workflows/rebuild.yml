@@ -1,0 +1,33 @@
+name: Rebuild site
+
+# Regenerates index.html whenever any data file changes (upcoming, partners,
+# clients, stats, or a manual events.json edit). Image events use process-event.yml.
+
+on:
+  push:
+    paths:
+      - 'data/**'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Rebuild index.html from data
+        run: python build_site.py
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name  "megapress-bot"
+          git config user.email "bot@megapressevents.com"
+          git add index.html
+          git commit -m "Rebuild site from data" || echo "No changes to commit"
+          git push

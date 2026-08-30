@@ -1,0 +1,29 @@
+name = "megapress-admin"
+main = "src/index.js"
+compatibility_date = "2026-06-01"
+
+# Serve the admin UI (worker/public) as static assets; /api/* is handled by the Worker.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# R2 bucket that holds the photos (same one the site reads from)
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "megapress-media"
+
+# Workers AI — powers the "Suggest tags" button (free tier)
+[ai]
+binding = "AI"
+
+# Public custom domain for the admin (gate it with Cloudflare Access)
+[[routes]]
+pattern = "admin.megapressevents.com"
+custom_domain = true
+
+[vars]
+GITHUB_REPO = "REPLACE_WITH_owner/megapressgr"   # e.g. stsentemeidis/megapressgr
+GITHUB_BRANCH = "main"
+MEDIA_BASE = "https://media.megapressevents.com"
+
+# Secret (do NOT put here) — set with:  wrangler secret put GITHUB_TOKEN

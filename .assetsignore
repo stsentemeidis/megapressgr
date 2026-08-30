@@ -1,5 +1,6 @@
 .git
 .gitignore
+.github/
 node_modules
 .DS_Store
 
@@ -13,10 +14,14 @@ node_modules
 /thumbs/
 /watermarked/
 
+# The admin portal is a separate Worker, not part of the public site.
+worker/
+
 # Source/working files that don't belong on the live site
 *.pptx
 create_thumbs.py
 embed_metadata.py
 build_site.py
+process_event.py
 index.built.html
 assets/

@@ -1,0 +1,48 @@
+name: Process event
+
+on:
+  # Triggered by the admin portal (via the Worker) with the event details
+  repository_dispatch:
+    types: [process-event]
+  # Manual trigger for testing from the Actions tab
+  workflow_dispatch:
+    inputs:
+      event:
+        description: 'Event JSON (see process_event.py header)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install Pillow boto3
+
+      - name: Process photos + update events
+        env:
+          R2_ACCOUNT_ID:        ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET:            megapress-media
+          EVENT_JSON:           ${{ github.event.inputs.event || toJSON(github.event.client_payload) }}
+        run: python process_event.py
+
+      - name: Rebuild site
+        run: python build_site.py
+
+      - name: Commit & push
+        run: |
+          git config user.name  "megapress-bot"
+          git config user.email "bot@megapressevents.com"
+          git add data/events.json index.html
+          git commit -m "Add event via portal" || echo "No changes to commit"
+          git push
