@@ -31,14 +31,5 @@
     "extraTags": [
       "300+ exhibitors"
     ]
-  },
-  {
-    "name": "test to delete",
-    "startDate": "2026-10-01",
-    "endDate": "2026-10-01",
-    "dateLabel": "1 OCT",
-    "year": 2026,
-    "extraTags": [],
-    "id": "test-to-delete-2026"
   }
 ]
