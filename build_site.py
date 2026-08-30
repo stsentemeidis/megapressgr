@@ -115,8 +115,14 @@ def render_b2b():
             '      </div>\n'
             f'      <div class="photo-grid" data-folder="{s["folder"]}" data-photos="{",".join(s["photos"])}"></div>\n    ')
 
+# ---------- YEAR FILTER (On Record) — dynamic from the events' years ----------
+def render_year_filter():
+    years=sorted({e["year"] for e in events}, reverse=True)
+    return "".join(f'\n        <button class="filter-btn ee-year" data-year="{y}">{y}</button>' for y in years)+"\n      "
+
 html=open(ROOT/"index.html", encoding="utf-8").read()
 regions=[
+ ("YEARFILTER", r'(<button class="filter-btn ee-year active" data-year="all">All</button>)([\s\S]*?)(</div>)', render_year_filter()),
  ("EVENTS", r'(<div class="programme" id="eeList">)([\s\S]*?)(</div><!-- /eeList -->)', render_events()),
  ("UPCOMING", r'(<section id="upcoming">[\s\S]*?<div class="programme">)([\s\S]*?)(</div>\s*</div>\s*</section>)', render_upcoming()),
  ("PARTNERS", r'(<section class="partners" id="partners">[\s\S]*?<div class="partners-track">)([\s\S]*?)(</div>\s*</div>\s*</section>)', render_partners()),
