@@ -1,11 +1,13 @@
 # Master originals — kept locally as backup, never pushed to the repo/site.
-# The live site serves only thumbs/ (clean) and watermarked/ (full-size).
-# Leading slash anchors to the repo root so thumbs/ and watermarked/ mirrors
-# of these folders are still tracked and deployed.
 /Events/
 /Exhibitions/
 /Pavilions/
 /B2B/
+
+# Web images now served from Cloudflare R2 (media.megapressevents.com), not the repo.
+# Local copies stay on disk; they just aren't tracked or deployed anymore.
+/thumbs/
+/watermarked/
 
 # Build artifact — the site is generated in place into index.html
 index.built.html

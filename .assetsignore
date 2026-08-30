@@ -3,14 +3,15 @@
 node_modules
 .DS_Store
 
-# Do not deploy the full-resolution master originals — the site only serves
-# clean thumbnails (thumbs/) and watermarked full-size copies (watermarked/).
-# Leading slash anchors to the repo root so thumbs/ and watermarked/ mirrors
-# of these folders are still served.
+# Do not deploy the full-resolution master originals.
 /Events/
 /Exhibitions/
 /Pavilions/
 /B2B/
+
+# Web images are served from Cloudflare R2 (media.megapressevents.com), not the repo.
+/thumbs/
+/watermarked/
 
 # Source/working files that don't belong on the live site
 *.pptx

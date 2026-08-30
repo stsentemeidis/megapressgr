@@ -1543,39 +1543,25 @@ function buildPhotoGrid(grid, photos, thumbs, fulls) {
 
 // Probe for thumbs/ folder with a small test fetch, then build all grids
 (function initGrids() {
+  // Images are served from Cloudflare R2 (thumbs = grid, watermarked = lightbox).
+  const MEDIA_BASE = 'https://media.megapressevents.com';
+  const url = (p) => encodeURI(`${MEDIA_BASE}/${p}`);
   const allGrids = Array.from(document.querySelectorAll('.photo-grid'));
 
-  function buildAll(useThumb) {
-    _thumbsAvailable = useThumb;
-    allGrids.forEach(grid => {
-      let photos = [], thumbs = null, fulls = null;
-      if (grid.dataset.folder && grid.dataset.photos !== undefined) {
-        const folder = grid.dataset.folder;
-        const files  = grid.dataset.photos.split(',').map(f => f.trim()).filter(Boolean);
-        photos = files.map(f => `${folder}/${f}`);
-        if (useThumb) {
-          thumbs = files.map(f => `thumbs/${folder}/${f}`);
-          fulls  = files.map(f => `watermarked/${folder}/${f}`);  // watermarked, for lightbox
-        }
-      } else if (grid.dataset.seeds) {
-        photos = grid.dataset.seeds.split(',').map(s => `https://picsum.photos/seed/${s.trim()}/600/400`);
-      }
-      buildPhotoGrid(grid, photos, thumbs, fulls);
-    });
-  }
-
-  // Try to reach the thumbs/ folder by fetching a known file from the first real grid
-  const firstReal = allGrids.find(g => g.dataset.folder && g.dataset.photos);
-  if (firstReal) {
-    const folder = firstReal.dataset.folder;
-    const file   = firstReal.dataset.photos.split(',')[0].trim();
-    const probe  = `thumbs/${folder}/${file}`;
-    fetch(probe, { method: 'HEAD' })
-      .then(r => buildAll(r.ok))
-      .catch(()  => buildAll(false));
-  } else {
-    buildAll(false);
-  }
+  _thumbsAvailable = true;
+  allGrids.forEach(grid => {
+    let photos = [], thumbs = null, fulls = null;
+    if (grid.dataset.folder && grid.dataset.photos !== undefined) {
+      const folder = grid.dataset.folder;
+      const files  = grid.dataset.photos.split(',').map(f => f.trim()).filter(Boolean);
+      thumbs = files.map(f => url(`thumbs/${folder}/${f}`));         // clean, for the grid
+      fulls  = files.map(f => url(`watermarked/${folder}/${f}`));    // watermarked, for the lightbox
+      photos = fulls.slice();  // watermarked copy is the safe fallback (masters are not served)
+    } else if (grid.dataset.seeds) {
+      photos = grid.dataset.seeds.split(',').map(s => `https://picsum.photos/seed/${s.trim()}/600/400`);
+    }
+    buildPhotoGrid(grid, photos, thumbs, fulls);
+  });
 })();
 
 // ── Expand / collapse ──────────────────────────────────────
