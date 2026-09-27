@@ -1,0 +1,30 @@
+name: Prune past upcoming
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # every day at 06:00 UTC
+  workflow_dispatch:        # allow a manual run from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Remove past upcoming events
+        run: python prune_upcoming.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "megapress-bot"
+          git config user.email "bot@megapressevents.com"
+          git add data/upcoming.json
+          git commit -m "Prune past upcoming events" || echo "No changes to commit"
+          git push

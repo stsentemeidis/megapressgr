@@ -23,5 +23,6 @@ create_thumbs.py
 embed_metadata.py
 build_site.py
 process_event.py
+prune_upcoming.py
 index.built.html
 assets/
