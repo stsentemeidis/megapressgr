@@ -103,6 +103,32 @@ async function handleApi(request, env, url) {
     return json({ ok: true, id: ev.id });
   }
 
+  // POST /api/edit-event — update an event's text fields; photos/folder are kept as-is
+  if (p === "edit-event" && request.method === "POST") {
+    const u = await request.json();
+    const { data, sha } = await ghGetFile(env, "data/events.json");
+    const ev = data.find((e) => e.id === u.id);
+    if (!ev) return json({ error: "event not found" }, 404);
+    ["name", "category", "year", "shortLabel", "caption", "extraTags"].forEach((k) => {
+      if (u[k] !== undefined) ev[k] = u[k];
+    });
+    await ghPutFile(env, "data/events.json", data, sha, `Edit event: ${ev.name}`);
+    return json({ ok: true });
+  }
+
+  // POST /api/delete-photo — remove a single photo from an event (and from R2)
+  if (p === "delete-photo" && request.method === "POST") {
+    const { eventId, filename } = await request.json();
+    const { data, sha } = await ghGetFile(env, "data/events.json");
+    const ev = data.find((e) => e.id === eventId);
+    if (!ev) return json({ error: "event not found" }, 404);
+    ev.photos = (ev.photos || []).filter((f) => f !== filename);
+    await ghPutFile(env, "data/events.json", data, sha, `Remove photo ${filename} from ${ev.name}`);
+    await env.MEDIA.delete(`thumbs/${ev.folder}/${filename}`);
+    await env.MEDIA.delete(`watermarked/${ev.folder}/${filename}`);
+    return json({ ok: true, photos: ev.photos });
+  }
+
   // POST /api/add-gallery — add photos to Pavilions/B2B (triggers the same Action)
   if (p === "add-gallery" && request.method === "POST") {
     const g = await request.json();   // { gallery, folder, photos: [...] }

@@ -115,14 +115,58 @@ $('#saveStats').addEventListener('click', async function(){ setStatus('#sStatus'
 
 // ---- manage list + partners/clients lists ----
 let mFilter='all', DATA={};
+const MEDIA='https://media.megapressevents.com';
 function renderManage(){
   const rows=[];
-  (DATA.events||[]).forEach(e=>rows.push({type:e.category,label:e.category==='event'?'Event':'Exhibition',id:e.id,name:e.name,meta:`${e.category==='event'?'Event':'Exhibition'} · ${e.year}`,count:`${(e.photos||[]).length} photos`,delType:'event'}));
-  (DATA.upcoming||[]).forEach(u=>rows.push({type:'upcoming',id:u.id,name:u.name,meta:`Upcoming · ${u.dateLabel||''} ${u.year||''}`,count:'—',delType:'upcoming'}));
+  (DATA.events||[]).forEach(e=>rows.push({type:e.category,id:e.id,name:e.name,meta:`${e.category==='event'?'Event':'Exhibition'} · ${e.year}`,count:`${(e.photos||[]).length} photos`,delType:'event',item:e}));
+  (DATA.upcoming||[]).forEach(u=>rows.push({type:'upcoming',id:u.id,name:u.name,meta:`Upcoming · ${u.dateLabel||''} ${u.year||''}`,count:'—',delType:'upcoming',item:u}));
   const el=$('#mlist'); el.innerHTML='';
-  rows.filter(r=>mFilter==='all'||r.type===mFilter).forEach(r=>{ const d=document.createElement('div'); d.className='mrow'; d.innerHTML=`<span></span><div><div class="m-name">${esc(r.name)}</div><div class="m-meta">${esc(r.meta)}</div></div><div class="m-count">${r.count}</div><button class="del-btn">Delete</button>`; d.querySelector('.del-btn').addEventListener('click',async function(){ if(!confirm('Delete "'+r.name+'"? This cannot be undone.'))return; this.textContent='…'; try{ await api('delete',{method:'POST',body:JSON.stringify({type:r.delType,id:r.id})}); d.remove(); }catch(e){ this.textContent='Delete'; alert('Error: '+e.message); } }); el.appendChild(d); });
+  rows.filter(r=>mFilter==='all'||r.type===mFilter).forEach(r=>{ const d=document.createElement('div'); d.className='mrow'; d.innerHTML=`<span></span><div><div class="m-name">${esc(r.name)}</div><div class="m-meta">${esc(r.meta)}</div></div><div class="m-count">${r.count}</div><div class="rowbtns"><button class="edit-btn">Edit</button><button class="del-btn">Delete</button></div>`; d.querySelector('.edit-btn').addEventListener('click',()=>openEdit(r.delType,r.item)); d.querySelector('.del-btn').addEventListener('click',async function(){ if(!confirm('Delete "'+r.name+'"? This cannot be undone.'))return; this.textContent='…'; try{ await api('delete',{method:'POST',body:JSON.stringify({type:r.delType,id:r.id})}); d.remove(); }catch(e){ this.textContent='Delete'; alert('Error: '+e.message); } }); el.appendChild(d); });
   if(!el.children.length) el.innerHTML='<p class="status">Nothing here.</p>';
 }
+
+// ---- edit modal (events + upcoming) ----
+let editCtx=null;
+function fieldHtml(label,id,value,type='text'){ return `<div class="field"><label>${label}</label><input type="${type}" id="${id}" value="${esc(value||'')}"></div>`; }
+function openEdit(kind,item){
+  editCtx={kind,item};
+  const F=$('#editFields');
+  if(kind==='upcoming'){
+    $('#editTitle').textContent='Edit upcoming'; $('#editSub').textContent='';
+    F.innerHTML=fieldHtml('Event name','ed_name',item.name)+`<div class="row2">`+fieldHtml('Start date','ed_start',item.startDate,'date')+fieldHtml('End date','ed_end',item.endDate||item.startDate,'date')+`</div>`+fieldHtml('Tags (comma-separated)','ed_tags',(item.extraTags||[]).join(', '));
+  } else {
+    $('#editTitle').textContent='Edit event'; $('#editSub').textContent='Fix text without re-uploading. Remove individual photos below.';
+    F.innerHTML=fieldHtml('Event name','ed_name',item.name)
+      +`<div class="row2"><div class="field"><label>Type</label><select id="ed_cat"><option value="event"${item.category==='event'?' selected':''}>Event</option><option value="exhibition"${item.category==='exhibition'?' selected':''}>Exhibition</option></select></div><div class="field"><label>Year</label><input type="text" id="ed_year" value="${esc(item.year)}"></div></div>`
+      +fieldHtml('Short label','ed_short',item.shortLabel)
+      +fieldHtml('Caption','ed_caption',item.caption)
+      +fieldHtml('Tags (comma-separated)','ed_tags',(item.extraTags||[]).join(', '))
+      +`<div class="field"><label>Photos (${(item.photos||[]).length}) — click ✕ to remove one</label><div class="thumbs" id="ed_photos"></div></div>`;
+    renderEditPhotos(item);
+  }
+  setStatus('#editStatus',''); $('#editModal').classList.add('open');
+}
+function renderEditPhotos(item){
+  const el=$('#ed_photos'); el.innerHTML='';
+  (item.photos||[]).forEach(fn=>{
+    const d=document.createElement('div'); d.className='thumb'; d.style.position='relative';
+    d.innerHTML=`<img src="${encodeURI(MEDIA+'/thumbs/'+item.folder+'/'+fn)}"><button title="Remove" style="position:absolute;top:2px;right:2px;background:rgba(226,81,58,0.92);color:#fff;border:none;border-radius:2px;width:18px;height:18px;cursor:pointer;font-size:11px;line-height:1">✕</button>`;
+    d.querySelector('button').addEventListener('click',async function(){ if(!confirm('Remove this photo from the event?'))return; this.textContent='…'; try{ const j=await api('delete-photo',{method:'POST',body:JSON.stringify({eventId:item.id,filename:fn})}); item.photos=j.photos; d.remove(); }catch(e){ this.textContent='✕'; alert('Error: '+e.message); } });
+    el.appendChild(d);
+  });
+  if(!(item.photos||[]).length) el.innerHTML='<p class="status">No photos left.</p>';
+}
+$('#editCancel').addEventListener('click',()=>{$('#editModal').classList.remove('open');load();});
+$('#editModal').addEventListener('click',e=>{ if(e.target.id==='editModal'){$('#editModal').classList.remove('open');load();} });
+$('#editSave').addEventListener('click',async function(){
+  const {kind,item}=editCtx; const tags=$('#ed_tags').value.split(',').map(s=>s.trim()).filter(Boolean);
+  setStatus('#editStatus','<span class="spin"></span> Saving…');
+  try{
+    if(kind==='upcoming'){ const start=$('#ed_start').value,end=$('#ed_end').value||start; await api('add-upcoming',{method:'POST',body:JSON.stringify({id:item.id,name:$('#ed_name').value.trim(),startDate:start,endDate:end,dateLabel:fmtLabel(start,end),year:new Date(start+'T00:00:00').getFullYear(),extraTags:tags})}); }
+    else { await api('edit-event',{method:'POST',body:JSON.stringify({id:item.id,name:$('#ed_name').value.trim(),category:$('#ed_cat').value,year:parseInt($('#ed_year').value,10),shortLabel:$('#ed_short').value.trim(),caption:$('#ed_caption').value.trim(),extraTags:tags})}); }
+    setStatus('#editStatus','Saved — live shortly.','ok'); setTimeout(()=>{$('#editModal').classList.remove('open');load();},700);
+  }catch(e){ setStatus('#editStatus','Error: '+e.message,'err'); }
+});
 document.querySelectorAll('.ftype').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('.ftype').forEach(x=>x.classList.remove('active')); b.classList.add('active'); mFilter=b.dataset.type; renderManage(); }));
 function renderContacts(listSel, arr, delType){ const el=$(listSel); el.innerHTML=''; (arr||[]).forEach(x=>{ const d=document.createElement('div'); d.className='mrow'; const logo=x.logo?`<span class="plogo"><img src="${x.logo}"></span>`:(x.svg?`<span class="plogo" style="color:var(--dim)">${x.svg}</span>`:`<span class="plogo"><span>${esc((x.name||'').slice(0,3).toUpperCase())}</span></span>`); d.innerHTML=`${logo}<div><div class="m-name">${esc(x.name)}</div><div class="m-meta">${esc(x.sub||'')}</div></div><span></span><button class="del-btn">Remove</button>`; d.querySelector('.del-btn').addEventListener('click',async function(){ this.textContent='…'; try{ await api('delete',{method:'POST',body:JSON.stringify({type:delType,id:x.id})}); d.remove(); }catch(e){ this.textContent='Remove'; alert('Error: '+e.message); } }); el.appendChild(d); }); }
 
