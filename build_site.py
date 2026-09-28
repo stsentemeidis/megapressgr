@@ -133,7 +133,7 @@ def render_testimonials():
                      f'        <div class="quote-attr">{attr}</div>\n'
                      '      </div>')
     return ('\n  <section class="testimonials" id="testimonials">\n    <div class="wrap">\n'
-            '      <p class="eyebrow" style="justify-content:center;margin-bottom:44px;">In their words</p>\n'
+            '      <p class="eyebrow" style="justify-content:center;margin-bottom:28px;">In their words</p>\n'
             + "\n".join(items) + '\n    </div>\n  </section>\n')
 
 html=open(ROOT/"index.html", encoding="utf-8").read()
