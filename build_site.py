@@ -2,7 +2,7 @@ import json, re, datetime
 from pathlib import Path
 ROOT=Path(__file__).parent
 def load(n): return json.load(open(ROOT/"data"/f"{n}.json", encoding="utf-8"))
-events=load("events"); upcoming=load("upcoming"); partners=load("partners"); clients=load("clients"); stats=load("stats"); galleries=load("galleries")
+events=load("events"); upcoming=load("upcoming"); partners=load("partners"); clients=load("clients"); stats=load("stats"); galleries=load("galleries"); testimonials=load("testimonials")
 TODAY=datetime.date.today()  # real build date drives auto-hide of past upcoming
 def esc(s): return str(s).replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
 
@@ -120,8 +120,25 @@ def render_year_filter():
     years=sorted({e["year"] for e in events}, reverse=True)
     return "".join(f'\n        <button class="filter-btn ee-year" data-year="{y}">{y}</button>' for y in years)+"\n      "
 
+# ---------- TESTIMONIALS ---------- (whole section renders only if there are any)
+def render_testimonials():
+    if not testimonials: return ""
+    items=[]
+    for t in testimonials:
+        role=t.get("role","")
+        attr=f'<span>{esc(t.get("name",""))}</span>'+(f' — {esc(role)}' if role else '')
+        items.append('      <div class="testimonial">\n'
+                     '        <div class="quote-mark">“</div>\n'
+                     f'        <blockquote>{esc(t["quote"])}</blockquote>\n'
+                     f'        <div class="quote-attr">{attr}</div>\n'
+                     '      </div>')
+    return ('\n  <section class="testimonials" id="testimonials">\n    <div class="wrap">\n'
+            '      <p class="eyebrow" style="justify-content:center;margin-bottom:44px;">In their words</p>\n'
+            + "\n".join(items) + '\n    </div>\n  </section>\n')
+
 html=open(ROOT/"index.html", encoding="utf-8").read()
 regions=[
+ ("TESTIMONIALS", r'(<!--TESTIMONIALS:START-->)([\s\S]*?)(<!--TESTIMONIALS:END-->)', render_testimonials()),
  ("YEARFILTER", r'(<button class="filter-btn ee-year active" data-year="all">All</button>)([\s\S]*?)(</div>)', render_year_filter()),
  ("EVENTS", r'(<div class="programme" id="eeList">)([\s\S]*?)(</div><!-- /eeList -->)', render_events()),
  ("UPCOMING", r'(<section id="upcoming">[\s\S]*?<div class="programme">)([\s\S]*?)(</div>\s*</div>\s*</section>)', render_upcoming()),

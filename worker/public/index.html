@@ -28,6 +28,8 @@
   .hint{color:var(--steel);font-size:11px;margin-top:6px;font-family:var(--mono);}
   input[type=text],input[type=date],select{width:100%;background:var(--black-2);border:1px solid var(--line);border-radius:3px;color:var(--paper);font-family:var(--body);font-size:15px;padding:12px 14px;color-scheme:dark;}
   input:focus,select:focus{outline:none;border-color:var(--orange);}
+  textarea{width:100%;background:var(--black-2);border:1px solid var(--line);border-radius:3px;color:var(--paper);font-family:var(--body);font-size:15px;padding:12px 14px;color-scheme:dark;resize:vertical;min-height:90px;}
+  textarea:focus{outline:none;border-color:var(--orange);}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
   .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:3px;overflow:hidden;}
   .seg button{background:none;border:none;border-right:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:12px;text-transform:uppercase;padding:11px 20px;cursor:pointer;}
@@ -89,6 +91,7 @@
     <button class="tab" data-tab="manage">Manage / delete</button>
     <button class="tab" data-tab="partners">Partners</button>
     <button class="tab" data-tab="clients">Clients</button>
+    <button class="tab" data-tab="testimonials">Testimonials</button>
     <button class="tab" data-tab="stats">Stats</button>
   </div>
   <main>
@@ -176,6 +179,16 @@
       <div class="actions"><button class="btn btn-primary" id="addClient">Add client</button><span class="status" id="cStatus"></span></div>
       <div class="sub-h">Current clients</div><div id="clist"></div>
     </section>
+    <!-- TESTIMONIALS -->
+    <section class="panel" id="p-testimonials">
+      <h1 class="panel-title">Testimonials</h1>
+      <p class="panel-note">Quotes shown near the bottom of the page (above "Let's cover your next stage"). Add, edit or remove.</p>
+      <div class="field"><label>Quote</label><textarea id="tQuote" rows="4" placeholder="What the client said…"></textarea></div>
+      <div class="row2"><div class="field"><label>Name</label><input type="text" id="tName" placeholder="e.g. Maria Konstantinou"></div><div class="field"><label>Role / company (optional)</label><input type="text" id="tRole" placeholder="e.g. Event Director, Helexpo"></div></div>
+      <div class="actions"><button class="btn btn-primary" id="saveTestimonial">Add testimonial</button><button class="btn btn-ghost" id="clearTestimonial" style="display:none">Cancel edit</button><span class="status" id="tStatus"></span></div>
+      <div class="sub-h">Current testimonials</div><div id="tlist"></div>
+    </section>
+
     <!-- STATS -->
     <section class="panel" id="p-stats">
       <h1 class="panel-title">Stats</h1>

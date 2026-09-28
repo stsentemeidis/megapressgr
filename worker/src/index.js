@@ -68,7 +68,7 @@ async function handleApi(request, env, url) {
 
   // GET /api/data — current content for the Manage/edit views
   if (p === "data" && request.method === "GET") {
-    const names = ["events", "upcoming", "partners", "clients", "stats"];
+    const names = ["events", "upcoming", "partners", "clients", "stats", "testimonials"];
     const out = {};
     for (const n of names) out[n] = (await ghGetFile(env, `data/${n}.json`)).data;
     return json(out);
@@ -159,6 +159,17 @@ async function handleApi(request, env, url) {
     return json({ ok: true });
   }
 
+  // POST /api/save-testimonial  (add or edit; upsert by id)
+  if (p === "save-testimonial" && request.method === "POST") {
+    const t = await request.json();
+    t.id = t.id || `t-${Date.now()}`;
+    const { data, sha } = await ghGetFile(env, "data/testimonials.json");
+    const next = data.filter((x) => x.id !== t.id);
+    next.push(t);
+    await ghPutFile(env, "data/testimonials.json", next, sha, `Save testimonial: ${t.name || t.id}`);
+    return json({ ok: true });
+  }
+
   // POST /api/save-stats  (full array)
   if (p === "save-stats" && request.method === "POST") {
     const stats = await request.json();
@@ -170,7 +181,7 @@ async function handleApi(request, env, url) {
   // POST /api/delete  { type, id }
   if (p === "delete" && request.method === "POST") {
     const { type, id } = await request.json();
-    const fileMap = { event: "data/events.json", upcoming: "data/upcoming.json", partner: "data/partners.json", client: "data/clients.json" };
+    const fileMap = { event: "data/events.json", upcoming: "data/upcoming.json", partner: "data/partners.json", client: "data/clients.json", testimonial: "data/testimonials.json" };
     const file = fileMap[type];
     if (!file) return json({ error: "bad type" }, 400);
     const { data, sha } = await ghGetFile(env, file);

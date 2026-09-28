@@ -170,7 +170,30 @@ $('#editSave').addEventListener('click',async function(){
 document.querySelectorAll('.ftype').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('.ftype').forEach(x=>x.classList.remove('active')); b.classList.add('active'); mFilter=b.dataset.type; renderManage(); }));
 function renderContacts(listSel, arr, delType){ const el=$(listSel); el.innerHTML=''; (arr||[]).forEach(x=>{ const d=document.createElement('div'); d.className='mrow'; const logo=x.logo?`<span class="plogo"><img src="${x.logo}"></span>`:(x.svg?`<span class="plogo" style="color:var(--dim)">${x.svg}</span>`:`<span class="plogo"><span>${esc((x.name||'').slice(0,3).toUpperCase())}</span></span>`); d.innerHTML=`${logo}<div><div class="m-name">${esc(x.name)}</div><div class="m-meta">${esc(x.sub||'')}</div></div><span></span><button class="del-btn">Remove</button>`; d.querySelector('.del-btn').addEventListener('click',async function(){ this.textContent='…'; try{ await api('delete',{method:'POST',body:JSON.stringify({type:delType,id:x.id})}); d.remove(); }catch(e){ this.textContent='Remove'; alert('Error: '+e.message); } }); el.appendChild(d); }); }
 
+// ---- testimonials ----
+let editingTid=null;
+function renderTestimonials(){
+  const el=$('#tlist'); el.innerHTML='';
+  (DATA.testimonials||[]).forEach(t=>{
+    const d=document.createElement('div'); d.className='mrow';
+    const short=(t.quote||'').slice(0,70)+((t.quote||'').length>70?'…':'');
+    d.innerHTML=`<span></span><div><div class="m-name">${esc(short)}</div><div class="m-meta">${esc(t.name||'')}${t.role?' · '+esc(t.role):''}</div></div><div class="rowbtns"><button class="edit-btn">Edit</button><button class="del-btn">Remove</button></div>`;
+    d.querySelector('.edit-btn').addEventListener('click',()=>{ editingTid=t.id; $('#tQuote').value=t.quote||''; $('#tName').value=t.name||''; $('#tRole').value=t.role||''; $('#saveTestimonial').textContent='Save changes'; $('#clearTestimonial').style.display=''; window.scrollTo(0,0); });
+    d.querySelector('.del-btn').addEventListener('click',async function(){ if(!confirm('Remove this testimonial?'))return; this.textContent='…'; try{ await api('delete',{method:'POST',body:JSON.stringify({type:'testimonial',id:t.id})}); d.remove(); }catch(e){ this.textContent='Remove'; alert('Error: '+e.message); } });
+    el.appendChild(d);
+  });
+  if(!(DATA.testimonials||[]).length) el.innerHTML='<p class="status">No testimonials yet.</p>';
+}
+function clearTestimonialForm(){ editingTid=null; $('#tQuote').value='';$('#tName').value='';$('#tRole').value=''; $('#saveTestimonial').textContent='Add testimonial'; $('#clearTestimonial').style.display='none'; setStatus('#tStatus',''); }
+$('#clearTestimonial').addEventListener('click',clearTestimonialForm);
+$('#saveTestimonial').addEventListener('click',async function(){
+  const quote=$('#tQuote').value.trim(); if(!quote){ setStatus('#tStatus','Enter a quote','err'); return; }
+  setStatus('#tStatus','<span class="spin"></span> Saving…');
+  try{ await api('save-testimonial',{method:'POST',body:JSON.stringify({id:editingTid,quote,name:$('#tName').value.trim(),role:$('#tRole').value.trim()})}); setStatus('#tStatus','Saved — live shortly.','ok'); clearTestimonialForm(); load(); }
+  catch(e){ setStatus('#tStatus','Error: '+e.message,'err'); }
+});
+
 function setStatus(sel,msg,cls){ const el=$(sel); el.className='status'+(cls?' '+cls:''); el.innerHTML=msg; }
 
-async function load(){ try{ DATA=await api('data',{method:'GET'}); statsData=DATA.stats||[]; renderStats(); renderManage(); renderContacts('#plist',DATA.partners,'partner'); renderContacts('#clist',DATA.clients,'client'); }catch(e){ $('#mlist').innerHTML='<p class="status err">Could not load data: '+e.message+'</p>'; } }
+async function load(){ try{ DATA=await api('data',{method:'GET'}); statsData=DATA.stats||[]; renderStats(); renderManage(); renderContacts('#plist',DATA.partners,'partner'); renderContacts('#clist',DATA.clients,'client'); renderTestimonials(); }catch(e){ $('#mlist').innerHTML='<p class="status err">Could not load data: '+e.message+'</p>'; } }
 load();
