@@ -1,5 +1,27 @@
 [
   {
+    "id": "kosmima-2026",
+    "category": "exhibition",
+    "year": 2026,
+    "shortLabel": "KOSMIMA",
+    "name": "KOSMIMA",
+    "caption": "KOSMIMA 2026",
+    "extraTags": [],
+    "folder": "Exhibitions/KOSMIMA 2026",
+    "photos": [
+      "SPYR3232.jpg",
+      "SPYR3176.jpg",
+      "SPYR3141.jpg",
+      "SPYR3107.jpg",
+      "SPYR1891.jpg",
+      "SPYR1834.jpg",
+      "SPYR1798.jpg",
+      "mp_1050693_kosmima_2026_2026-10-17.jpg",
+      "mp_1050689_kosmima_2026_2026-10-17.jpg",
+      "mp_1050687_kosmima_2026_2026-10-17.jpg"
+    ]
+  },
+  {
     "id": "34th-european-association-for-sport-management-conference-2026",
     "category": "event",
     "year": 2026,
